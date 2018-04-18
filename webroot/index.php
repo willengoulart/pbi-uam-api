@@ -15,9 +15,10 @@
  * @license       MIT License (https://opensource.org/licenses/mit-license.php)
  */
 
+error_reporting(E_ALL);
+
 // Check platform requirements
 require dirname(__DIR__) . '/config/requirements.php';
-
 // For built-in server
 if (php_sapi_name() === 'cli-server') {
     $_SERVER['PHP_SELF'] = '/' . basename(__FILE__);
