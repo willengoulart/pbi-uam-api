@@ -43,6 +43,8 @@ class AppController extends Controller
 
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
+        $this->autoRender = false;
+        $this->response = $this->response->withType('application/json');
 
         /*
          * Enable the following components for recommended CakePHP security settings.
