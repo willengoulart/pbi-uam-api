@@ -16,4 +16,4 @@ $ bin/cake migrations migrate
 
 ## Especificação da API
 
-A especificação da API pode ser vista (aqui)[./api-reference.md]
+A especificação da API pode ser vista [aqui](./api-reference.md)
