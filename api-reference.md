@@ -1,5 +1,25 @@
 # Especificação de API - Progress: BI
 
+## Lista de Conteúdo
+
+* [Cursos](#cursos)
+    - [Listar cursos](#listar-cursos)
+    - [Informações do curso](#informações-do-curso)
+* [Turmas](#turmas)
+    - [Listar turmas](#listar-turmas)
+    - [Informações da turma](#informações-da-turma)
+* [Alunos](#alunos)
+    - [Listar alunos](#listar-alunos)
+    - [Informações do aluno](#informações-do-aluno)
+* [Provas](#provas)
+    - [Listar provas](#listar-provas)
+    - [Informações da prova](#informações-da-prova)
+* [Categorias](#categorias)
+    - [Listar categorias](#listar-categorias)
+    - [Informações da categoria](#informações-da-categorias)
+* [Resultados](#resultados)
+    - [Buscar resultados](#buscar-resultados)
+
 ## Cursos
 
 Método                                        | URL                           | Descrição curta
@@ -21,12 +41,12 @@ status    | `Number` ou `Array` | 1 (ativo) | Filtra a lista de cursos pelo stat
 
 ``` javascript
 $.ajax({
-	url: '/courses',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		status: [0, 1], // Retorna todos os cursos do sistema
-	},
+    url: '/courses',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        status: [0, 1], // Retorna todos os cursos do sistema
+    },
 });
 ```
 
@@ -34,13 +54,13 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    ]
 }
 ```
 
@@ -56,9 +76,9 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-	url: '/courses/' + courseId,
-	method: 'GET',
-	dataType: 'json',
+    url: '/courses/' + courseId,
+    method: 'GET',
+    dataType: 'json',
 });
 ```
 
@@ -66,11 +86,11 @@ $.ajax({
 
 ``` json
 {
-	"data": {
-		"id": "Number",
-		"name": "String",
-		"status": "Number"
-	}
+    "data": {
+        "id": "Number",
+        "name": "String",
+        "status": "Number"
+    }
 }
 ```
 
@@ -96,13 +116,13 @@ courseId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de turmas p
 
 ``` javascript
 $.ajax({
-	url: '/classes',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		status: 1,
-		courseId: 14,
-	},
+    url: '/classes',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        status: 1,
+        courseId: 14,
+    },
 });
 ```
 
@@ -110,13 +130,13 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    ]
 }
 ```
 
@@ -132,9 +152,9 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-	url: '/classes/' + classId,
-	method: 'GET',
-	dataType: 'json',
+    url: '/classes/' + classId,
+    method: 'GET',
+    dataType: 'json',
 });
 ```
 
@@ -142,18 +162,18 @@ $.ajax({
 
 ``` json
 {
-	"data": {
-		"id": "Number",
-		"name": "String",
-		"code": "String",
-		"period": "String",
-		"status": "Number",
-		"course": {
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	}
+    "data": {
+        "id": "Number",
+        "name": "String",
+        "code": "String",
+        "period": "String",
+        "status": "Number",
+        "course": {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    }
 }
 ```
 
@@ -180,14 +200,14 @@ classId   | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos p
 
 ``` javascript
 $.ajax({
-	url: '/students',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		status: 1,
-		courseId: 14,
-		classId: [25, 26],
-	},
+    url: '/students',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        status: 1,
+        courseId: 14,
+        classId: [25, 26],
+    },
 });
 ```
 
@@ -195,13 +215,13 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    ]
 }
 ```
 
@@ -217,9 +237,9 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-	url: '/students/' + studentId,
-	method: 'GET',
-	dataType: 'json',
+    url: '/students/' + studentId,
+    method: 'GET',
+    dataType: 'json',
 });
 ```
 
@@ -227,24 +247,24 @@ $.ajax({
 
 ``` json
 {
-	"data": {
-		"id": "Number",
-		"name": "String",
-		"ra": "String",
-		"status": "Number",
-		"course": {
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		},
-		"classes": [
-			{
-				"id": "Number",
-				"name": "String",
-				"status": "Number"
-			}
-		]
-	}
+    "data": {
+        "id": "Number",
+        "name": "String",
+        "ra": "String",
+        "status": "Number",
+        "course": {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        },
+        "classes": [
+            {
+                "id": "Number",
+                "name": "String",
+                "status": "Number"
+            }
+        ]
+    }
 }
 ```
 
@@ -271,14 +291,14 @@ studentId | `Number`, `Array` ou `null` | `null`    | Filtra a lista de provas p
 
 ``` javascript
 $.ajax({
-	url: '/tests',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		status: 1,
-		courseId: 14,
-		studentId: [107, 109, 104],
-	},
+    url: '/tests',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        status: 1,
+        courseId: 14,
+        studentId: [107, 109, 104],
+    },
 });
 ```
 
@@ -286,13 +306,13 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    ]
 }
 ```
 
@@ -308,9 +328,9 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-	url: '/tests/' + testId,
-	method: 'GET',
-	dataType: 'json',
+    url: '/tests/' + testId,
+    method: 'GET',
+    dataType: 'json',
 });
 ```
 
@@ -318,17 +338,17 @@ $.ajax({
 
 ``` json
 {
-	"data": {
-		"id": "Number",
-		"name": "String",
-		"code": "String",
-		"status": "Number",
-		"course": {
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	}
+    "data": {
+        "id": "Number",
+        "name": "String",
+        "code": "String",
+        "status": "Number",
+        "course": {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    }
 }
 ```
 
@@ -355,14 +375,14 @@ testId    | `Number`, `Array` ou `null` | `null`    | Filtra a lista de categori
 
 ``` javascript
 $.ajax({
-	url: '/categories',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		status: 1,
-		courseId: 10,
-		testId: 2,
-	},
+    url: '/categories',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        status: 1,
+        courseId: 10,
+        testId: 2,
+    },
 });
 ```
 
@@ -370,13 +390,13 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"status": "Number"
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "status": "Number"
+        }
+    ]
 }
 ```
 
@@ -392,9 +412,9 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-	url: '/categories/' + categoryId,
-	method: 'GET',
-	dataType: 'json',
+    url: '/categories/' + categoryId,
+    method: 'GET',
+    dataType: 'json',
 });
 ```
 
@@ -402,25 +422,25 @@ $.ajax({
 
 ``` json
 {
-	"data": {
-		"id": "Number",
-		"name": "String",
-		"status": "Number",
-		"courses": [
-			{
-				"id": "Number",
-				"name": "String",
-				"status": "Number"
-			}
-		],
-		"tests": [
-			{
-				"id": "Number",
-				"name": "String",
-				"status": "Number"
-			}
-		]
-	}
+    "data": {
+        "id": "Number",
+        "name": "String",
+        "status": "Number",
+        "courses": [
+            {
+                "id": "Number",
+                "name": "String",
+                "status": "Number"
+            }
+        ],
+        "tests": [
+            {
+                "id": "Number",
+                "name": "String",
+                "status": "Number"
+            }
+        ]
+    }
 }
 ```
 
@@ -445,14 +465,14 @@ categoryId | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resulta
 
 ``` javascript
 $.ajax({
-	url: '/results',
-	method: 'GET',
-	dataType: 'json',
-	data: {
-		testId: 2,
-		studentId: 11,
-		categoryId: [1, 3],
-	},
+    url: '/results',
+    method: 'GET',
+    dataType: 'json',
+    data: {
+        testId: 2,
+        studentId: 11,
+        categoryId: [1, 3],
+    },
 });
 ```
 
@@ -460,30 +480,30 @@ $.ajax({
 
 ``` json
 {
-	"data": [
-		{
-			"id": "Number",
-			"name": "String",
-			"errors": "Number",
-			"hits": "Number",
-			"category": {
-				"id": "Number",
-				"name": "String",
-				"status": "Number",
-			},
-			"test": {
-				"id": "Number",
-				"name": "String",
-				"code": "String",
-				"status": "Number",
-			},
-			"student": {
-				"id": "Number",
-				"name": "String",
-				"ra": "String",
-				"status": "Number"
-			}
-		}
-	]
+    "data": [
+        {
+            "id": "Number",
+            "name": "String",
+            "errors": "Number",
+            "hits": "Number",
+            "category": {
+                "id": "Number",
+                "name": "String",
+                "status": "Number",
+            },
+            "test": {
+                "id": "Number",
+                "name": "String",
+                "code": "String",
+                "status": "Number",
+            },
+            "student": {
+                "id": "Number",
+                "name": "String",
+                "ra": "String",
+                "status": "Number"
+            }
+        }
+    ]
 }
 ```
