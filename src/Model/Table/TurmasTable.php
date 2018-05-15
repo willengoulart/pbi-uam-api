@@ -36,10 +36,12 @@ class TurmasTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Cursos', [
+        $this->belongsTo('Curso', [
+            'className'=>'Cursos',
             'foreignKey' => 'curso_id',
             'joinType' => 'INNER'
         ]);
+
     }
 
     /**
