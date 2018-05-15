@@ -17,7 +17,13 @@ class ResultadosController extends AppController{
     $query = $this->Resultados->find();
     $filter = $this->request->query();
     $query = $query->where($filter);
-    return $this->response->withStringBody(json_encode($query->all()));
+    $data = $query->contain(['Alunos', 'Categorias', 'Provas'])->hydrate(false)->indexBy('id')->toArray();
+    foreach($data as &$item){
+      unset($item['aluno_id']);
+      unset($item['categoria_id']);
+      unset($item['prova_id']);
+    }
+    return $this->response->withStringBody(json_encode($data));
   }
 
   public function getResultadosFromUser(){
