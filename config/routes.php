@@ -58,6 +58,8 @@ Router::scope('/', function (RouteBuilder $routes) {
      */
     $routes->connect('/pages/*', ['controller' => 'Pages', 'action' => 'display']);
 
+    $routes->connect('/:controller/:id', ['action'=>'view'])->setPatterns(['id' => '\d+'])->setPass(['id']);;
+
     /**
      * Connect catchall routes for all controllers.
      *
