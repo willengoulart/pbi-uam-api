@@ -26,6 +26,7 @@ class Aluno extends Entity
      * @var array
      */
     protected $_accessible = [
+        'id' => true,
         'usuario_id' => true,
         'ra' => true,
         'usuario' => true,
