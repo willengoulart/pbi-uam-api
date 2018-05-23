@@ -2,6 +2,7 @@
 
 ## Lista de Conteúdo
 
+* [Parâmetros de filtragem](#parametros-filtragem)
 * [Cursos](#cursos)
     - [Listar cursos](#listar-cursos)
     - [Informações do curso](#informações-do-curso)
@@ -19,23 +20,37 @@
     - [Informações da categoria](#informações-da-categorias)
 * [Resultados](#resultados)
     - [Buscar resultados](#buscar-resultados)
+    
+## Parâmetros de filtragem
+O PBI utiliza filtros altamente customizáveis para todas as endpoints de lista, a fim de tornar a utilização da API simples e fácil de usar ao mesmo tempo que a torna altamente poderosa, oferecendo liberdade para o utilizador extrair as informações como preferir.
+
+Sempre que o utilizador utilizar um endpoint de listagem, ele poderá utilizar query strings para filtrar os dados através de QUALQUER CAMPO. Ou seja, se o endpoint possui os parâmetros foo e bar, o modelo FooBar pode ser assim filtrado:
+
+/foobar?foo=1
+Retorna todos os resultados em que foo assume valor 1.
+
+/foobar?bar=[1,2,3]
+Retorna todos os resultados em que bar assume os valores 1 OU 2 OU 3.
+
+/foobar?foo=1&bar=2
+Retorna todos os resultados em que foo assume o valor 1 E bar assume o valor 2
 
 ## Cursos
 
 Método                                        | URL                           | Descrição curta
 --------------------------------------------- | ----------------------------- | -----------------
-[Listar cursos](#listar-cursos)               | **GET:** `/courses`           | Retorna a lista de cursos cadastrados no sistema
-[Informações do curso](#informações-do-curso) | **GET:** `/courses/:courseId` | Retorna as informações do curso solicitado
+[Listar cursos](#listar-cursos)               | **GET:** `/cursos `           | Retorna a lista de cursos cadastrados no sistema
+[Informações do curso](#informações-do-curso) | **GET:** `/cursos/:cursoId`   | Retorna as informações do curso solicitado
+
+### Parâmetros
+Parâmetro | Tipo                        | Descrição
+--------- | --------------------------- |-----------
+status    | `Integer` ou `Array`        | Filtra os cursos pelo status
+name      | `String` ou `Array`         | Filtra os cursos pelo nome do curso
 
 ### Listar cursos
 
 Retorna a lista de cursos cadastrados no sistema baseada nos filtros informados.
-
-#### Parâmetros
-
-Parâmetro | Tipo                | Default   | Descrição
---------- | ------------------- | --------- |-----------
-status    | `Number` ou `Array` | 1 (ativo) | Filtra a lista de cursos pelo status
 
 #### Exemplo de requisição (Ajax)
 
