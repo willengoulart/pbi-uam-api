@@ -14,41 +14,26 @@ use Cake\ORM\TableRegistry;
  */
 class ParserController extends AppController{
 
-	private function parseExample(){
-		//$parse = new Parser();
-		//$parsed_data = $parse->parse();
+	private $parser;
 
-		$parsed_data = [
-			['prova_id'=>1, 'aluno_id'=>1, 'categoria_id'=>1, 'acertos'=>20, "erros"=>30],
-			['prova_id'=>1, 'aluno_id'=>2, 'categoria_id'=>1, 'acertos'=>20, "erros"=>30]
-		];
-
-		$this->Resultados = TableRegistry::get('Resultados');
-
-		$parsed_obj = $this->Resultados->newEntities($parsed_data);
-		//pr($parsed_obj);
-
-		$find = ($this->Resultados->find()->where(['aluno_id'=>2]));
-		foreach($find as $item) pr($item);
-
-		foreach($parsed_obj as $item){
-			$this->Resultados->save($item);
-			pr($item);
-		}
-
+	function __construct() {
+		$this->parser = new Parser();
 	}
 
 	public function parse(){
+		$time_start = microtime(true);
 		$this->parseCursos();
 		$this->parseProvas();
 		$this->parseTurmas();
-		$this->parseAlunos();
 		$this->parseResultados();
+		$this->parseAlunos();
+		$time_end = microtime(true);
+		$time = $time_end - $time_start;
+		echo "<br>" . $time;
 	}
 
-	public function parseResultados() {
-		$parse = new Parser();
-		$parsed_data = $parse->parseResultados();
+	public function parseResultados(){
+		$parsed_data = $this->parser->parseResultados();
 		if ($parsed_data != null) {
 			$this->Resultados = TableRegistry::get('Resultados');
 			$parsed_obj = $this->Resultados->newEntities($parsed_data);
@@ -59,8 +44,7 @@ class ParserController extends AppController{
 	}
 
 	public function parseAlunos() {
-		$parse = new Parser();
-		$parsed_data = $parse->parseAlunos();
+		$parsed_data = $this->parser->parseAlunos();
 		if ($parsed_data != null) {
 			$this->Alunos = TableRegistry::get('Alunos');
 			$parsed_obj = $this->Alunos->newEntities($parsed_data);
@@ -71,8 +55,7 @@ class ParserController extends AppController{
 	}
 
 	public function parseProvas() {
-		$parse = new Parser();
-		$parsed_data = $parse->parseProvas();
+		$parsed_data = $this->parser->parseProvas();
 		if ($parsed_data != null) {
 			$this->Provas = TableRegistry::get('Provas');
 			$parsed_obj = $this->Provas->newEntities($parsed_data);
@@ -83,8 +66,7 @@ class ParserController extends AppController{
 	}
 
 	public function parseCursos() {
-		$parse = new Parser();
-		$parsed_data = $parse->parseCursos();
+		$parsed_data = $this->parser->parseCursos();
 		if ($parsed_data != null) {
 			$this->Cursos = TableRegistry::get('Cursos');
 			$parsed_obj = $this->Cursos->newEntities($parsed_data);
@@ -95,8 +77,7 @@ class ParserController extends AppController{
 	}
 
 	public function parseTurmas() {
-		$parse = new Parser();
-		$parsed_data = $parse->parseTurmas();
+		$parsed_data = $this->parser->parseTurmas();
 		if ($parsed_data != null) {
 			$this->Turmas = TableRegistry::get('Turmas');
 			$parsed_obj = $this->Turmas->newEntities($parsed_data);

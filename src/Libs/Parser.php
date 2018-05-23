@@ -7,83 +7,28 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Parser{
 
-	private function parseExample(){
-		$uploadPath = getcwd()."/src/Libs/"; // index.php/src/Libs (caminho ate planilha)
-		$filename = "DadosTP_mask.xlsx"; // nome da planilhas
+	private $spreadsheet;
+
+	/* TODO
+		parseAlunos -> usuarioID
+		parseResultados -> categoriaID
+	*/
+
+	function __construct() {
+		$uploadPath = getcwd()."/src/Libs/"; 
+		$filename = "DadosTP_mask.xlsx"; 
 		$inputFileName = $uploadPath . $filename;		
 	  	$inputFileType = IOFactory::identify($inputFileName);
 	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-
+		$reader->setReadDataOnly(true);	
 		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			// carrega apenas a planilha X na memoria ao inves de carregar todas de uma vez
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-
-			$highestRow = $worksheet->getHighestRow();
-			//HIGHESTCOL PRECISA DE use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-			//$highestCol = Coordinate::ColumnIndexFromString($worksheet->getHighestColumn());
-
-			for ($row = 3; $row <= $highestRow; $row++) {
-				//for ($col = 0; $col < $highestCol; $col++) {
-					
-					// Busca algum ID de outra tabela
-					$this->Provas = TableRegistry::get('Provas');
-					$find_prova = ($this->Provas->find()->where(['code'=>$worksheetName]));
-					$prova_id = null;
-					foreach($find_prova as $item){
-						$prova_id = $item->id;
-					} 
-
-					// Checa se alguns dos IDs de outra tabela esta vazio
-					if (empty($aluno_id) || empty($prova_id)) {
-						continue;
-					}
-
-					// Algumas planilhas tem dados a mais / a menos
-					if ($worksheetName == 'CCOM_17_1_1') {
-						$parsedItem = [
-							'acertos'=>(int) $worksheet->getCellByColumnAndRow(14, $row)->getValue(), 
-							'erros'=>(int) (40-$worksheet->getCellByColumnAndRow(14, $row)->getValue())
-						];
-					} else {
-						$parsedItem = [	
-							'acertos'=>(int) $worksheet->getCellByColumnAndRow(13, $row)->getValue(), 
-							'erros'=>(int) (40 - $worksheet->getCellByColumnAndRow(13, $row)->getValue())
-						];
-					}
-
-					$parsedItem = [				    
-						'categoria_id'=>200, 	
-						'prova_id'=>$prova_id, 
-						'aluno_id'=>$aluno_id
-					];
-
-					$parsedData[] = $parsedItem;
-				//}
-			}        
-		}
-		  
-		return $parsedData;
+		$this->spreadsheet = $reader->load($inputFileName);
 	}
 
-	public function parseResultados(){	
-		$uploadPath = getcwd()."/src/Libs/";
-		$filename = "DadosTP_mask.xlsx";
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-			$highestRow = $worksheet->getHighestRow();
+	public function parseResultados() {	
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$worksheetName = $worksheet->getTitle();
+		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
 				$ra = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
@@ -95,7 +40,7 @@ class Parser{
 				$this->Provas = TableRegistry::get('Provas');
 				$find_prova = ($this->Provas->find()->where(['code'=>$worksheetName]));
 				$prova_id = null;
-				foreach($find_prova as $item) $prova_id = $item->id; 
+				foreach($find_prova as $item) $prova_id = $item->id;
 
 				if (empty($aluno_id) || empty($prova_id)) continue;
 				//if (empty($aluno_id) || empty($prova_id)) { $aluno_id = 200; $prova_id = 200; }
@@ -103,12 +48,12 @@ class Parser{
 				if ($worksheetName == 'CCOM_17_1_1') {
 					$parsedItem = [
 						'acertos'=>(int) $worksheet->getCellByColumnAndRow(14, $row)->getValue(), 
-						'erros'=>(int) (40-$worksheet->getCellByColumnAndRow(14, $row)->getValue())
+						'erros'=>(int) (40-$worksheet->getCellByColumnAndRow(14, $row)->getValue()),				    
 					];
 				} else {
 					$parsedItem = [	
 						'acertos'=>(int) $worksheet->getCellByColumnAndRow(13, $row)->getValue(), 
-						'erros'=>(int) (40 - $worksheet->getCellByColumnAndRow(13, $row)->getValue())
+						'erros'=>(int) (40 - $worksheet->getCellByColumnAndRow(13, $row)->getValue()),				    
 					];
 				}
 
@@ -125,19 +70,9 @@ class Parser{
 	}
 
 	public function parseAlunos() {
-		$uploadPath = getcwd()."/src/Libs/";
-		$filename = "DadosTP_mask.xlsx";
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-			$highestRow = $worksheet->getHighestRow();
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$worksheetName = $worksheet->getTitle();
+		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
 				$nome = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
@@ -146,8 +81,8 @@ class Parser{
 				$usuario_id = null;
 				foreach($find_usuario as $item) $usuario_id = $item->id; 
 				
-				//if (empty($usuario_id)) $usuario_id = 200;
-				if (empty($usuario_id)) continue;
+				if (empty($usuario_id)) $usuario_id = 200; //TODO
+				//if (empty($usuario_id)) continue;
 
 				$parsedItem = [									
 					'usuario_id'=>$usuario_id,
@@ -160,20 +95,10 @@ class Parser{
 		return $parsedData;
 	}
 
-	public function parseCursos() {
-		$uploadPath = getcwd()."/src/Libs/";
-		$filename = "DadosTP_mask.xlsx";
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-			$highestRow = $worksheet->getHighestRow();
+	public function parseCursos() {		
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$worksheetName = $worksheet->getTitle();
+		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
 				if ($worksheetName == 'CCOM_17_1_1') {	
@@ -189,19 +114,9 @@ class Parser{
 	}
 
 	public function parseProvas() {
-		$uploadPath = getcwd()."/src/Libs/";
-		$filename = "DadosTP_mask.xlsx";
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-			$highestRow = $worksheet->getHighestRow();
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$worksheetName = $worksheet->getTitle();
+		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
 				if ($worksheetName == 'CCOM_17_1_1') {
@@ -231,19 +146,9 @@ class Parser{
 	}
 
 	public function parseTurmas() {
-		$uploadPath = getcwd()."/src/Libs/";
-		$filename = "DadosTP_mask.xlsx";
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-
-	  	foreach ($worksheetNames as $worksheetName) {			
-			$reader->setLoadSheetsOnly($worksheetName); 
-			$spreadsheet = $reader->load($inputFileName);
-			$worksheet = $spreadsheet->getSheetByName($worksheetName);
-			$highestRow = $worksheet->getHighestRow();
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$worksheetName = $worksheet->getTitle();
+		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
 				if ($worksheetName == 'CCOM_17_1_1') {
@@ -263,13 +168,13 @@ class Parser{
 					$parsedItem = [
 						'code'=>$worksheet->getCellByColumnAndRow(6, $row)->getValue(),
 						'name'=>$worksheet->getCellByColumnAndRow(6, $row)->getValue(),
-						'periodo'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue()
+						'periodo'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
 					];
 				} else {
 					$parsedItem = [
 						'code'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
 						'name'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
-						'periodo'=>$worksheet->getCellByColumnAndRow(4, $row)->getValue()
+						'periodo'=>$worksheet->getCellByColumnAndRow(4, $row)->getValue(),
 					];
 				}
 
