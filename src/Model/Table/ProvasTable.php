@@ -41,6 +41,10 @@ class ProvasTable extends Table
             'foreignKey' => 'curso_id',
             'joinType' => 'INNER'
         ]);
+        $this->belongsTo('Turmas', [
+            'foreignKey' => 'turma_id',
+            'joinType' => 'INNER'
+        ]);
         $this->hasMany('Resultados', [
             'foreignKey' => 'prova_id'
         ]);

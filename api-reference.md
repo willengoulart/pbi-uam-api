@@ -385,8 +385,8 @@ $.ajax({
 
 Método                                        | URL                       | Descrição curta
 --------------------------------------------- | ------------------------- | -----------------
-[Listar provas](#listar-provas)               | **GET:** `/tests`         | Retorna a lista de provas cadastradas no sistema
-[Informações da prova](#informações-da-prova) | **GET:** `/tests/:testId` | Retorna as informações da prova solicitada
+[Listar provas](#listar-provas)               | **GET:** `/provas`         | Retorna a lista de provas cadastradas no sistema
+[Informações da prova](#informações-da-prova) | **GET:** `/provas/:testId` | Retorna as informações da prova solicitada
 
 ### Listar provas
 
@@ -396,21 +396,21 @@ Retorna a lista de provas cadastradas no sistema baseada nos filtros informados.
 
 Parâmetro | Tipo                        | Default   | Descrição
 --------- | --------------------------- | --------- |-----------
-status    | `Number` ou `Array`         | 1 (ativo) | Filtra a lista de provas pelo status
-courseId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de provas pelos cursos aos quais pertencem
-studentId | `Number`, `Array` ou `null` | `null`    | Filtra a lista de provas pelos alunos que a fizeram
+cursoId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de provas pelos cursos aos quais pertencem
+turmaId | `Number`, `Array` ou `null` | `null`    | Filtra a lista de provas pelas turmas aos quais pertencem
+
+Além dos parâmetros específicos também é possível efetuar a busca pelo parâmetros de Cursos e Turmas
 
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/tests',
+    url: '/provas',
     method: 'GET',
     dataType: 'json',
     data: {
-        status: 1,
-        courseId: 14,
-        studentId: [107, 109, 104],
+        cursoId: 14,
+        turmaId: 1
     },
 });
 ```
@@ -420,11 +420,25 @@ $.ajax({
 ``` json
 {
     "data": [
-        {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
+      {
+      "id": 1,
+      "curso_id": 1,
+      "name": "Prova 1",
+      "code": "P1",
+      "turma_id": 1,
+      "turma": {
+          "id": 1,
+          "name": "TURMA",
+          "code": "1",
+          "curso_id": 1,
+          "periodo": "M"
+      },
+      "curso": {
+          "id": 1,
+          "name": "A",
+          "status": true
+      }
+  }
     ]
 }
 ```
@@ -441,7 +455,7 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-    url: '/tests/' + testId,
+    url: '/provas/' + testId,
     method: 'GET',
     dataType: 'json',
 });
@@ -451,17 +465,23 @@ $.ajax({
 
 ``` json
 {
-    "data": {
-        "id": "Number",
-        "name": "String",
-        "code": "String",
-        "status": "Number",
-        "course": {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
-    }
+  "id": 1,
+  "curso_id": 1,
+  "name": "Prova 1",
+  "code": "P1",
+  "turma_id": 1,
+  "turma": {
+      "id": 1,
+      "name": "TURMA",
+      "code": "1",
+      "curso_id": 1,
+      "periodo": "M"
+  },
+  "curso": {
+      "id": 1,
+      "name": "A",
+      "status": true
+  }
 }
 ```
 
