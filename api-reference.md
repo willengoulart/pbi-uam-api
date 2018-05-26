@@ -333,23 +333,50 @@ $.ajax({
 
 ``` json
 {
-    "data": {
-        "id": "Number",
-        "name": "String",
-        "ra": "String",
-        "status": "Number",
-        "course": {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        },
-        "classes": [
-            {
-                "id": "Number",
-                "name": "String",
-                "status": "Number"
+    "id": 1,
+    "usuario_id": 1,
+    "ra": 9999999,
+    "turmas": [
+        {
+            "id": 2,
+            "name": "Turma 2",
+            "code": "1",
+            "curso_id": 1,
+            "periodo": "M",
+            "_joinData": {
+                "id": 2,
+                "aluno_id": 1,
+                "turma_id": 2
             }
-        ]
+        }
+    ],
+    "cursos": [
+        {
+            "id": 1,
+            "name": "A",
+            "status": true,
+            "_joinData": {
+                "id": 1,
+                "aluno_id": 1,
+                "curso_id": 1
+            }
+        },
+        {
+            "id": 2,
+            "name": "B",
+            "status": true,
+            "_joinData": {
+                "id": 2,
+                "aluno_id": 1,
+                "curso_id": 2
+            }
+        }
+    ],
+    "usuario": {
+        "id": 1,
+        "email": "email@example.com",
+        "senha": "123",
+        "nome": "John Doe"
     }
 }
 ```

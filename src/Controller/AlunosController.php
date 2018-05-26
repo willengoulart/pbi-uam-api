@@ -40,7 +40,7 @@ class AlunosController extends AppController
   public function view($id = null)
   {
       $turma = $this->Alunos->get($id, [
-          'contain' => ['Usuarios', 'Resultados']
+          'contain' => ['Usuarios', 'Cursos', 'Turmas']
       ]);
 
       return $this->response->withStringBody(json_encode($turma));
