@@ -86,8 +86,8 @@ class ResultadosTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        // $rules->add($rules->existsIn(['prova_id'], 'Provas'));
-        // $rules->add($rules->existsIn(['aluno_id'], 'Alunos'));
+        $rules->add($rules->existsIn(['prova_id'], 'Provas'));
+        $rules->add($rules->existsIn(['aluno_id'], 'Alunos'));
         // $rules->add($rules->existsIn(['categoria_id'], 'Categorias'));
 
         return $rules;

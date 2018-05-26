@@ -25,6 +25,7 @@ class Curso extends Entity
      * @var array
      */
     protected $_accessible = [
+        'id' => true,
         'name' => true,
         'provas' => true,
         'turmas' => true

@@ -86,7 +86,7 @@ class TurmasTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['curso_id'], 'Cursos'));
+        //$rules->add($rules->existsIn(['curso_id'], 'Cursos'));
 
         return $rules;
     }

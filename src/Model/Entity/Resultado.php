@@ -30,6 +30,7 @@ class Resultado extends Entity
      * @var array
      */
     protected $_accessible = [
+        'id' => true,
         'prova_id' => true,
         'aluno_id' => true,
         'categoria_id' => true,
