@@ -239,15 +239,19 @@ ra    | `Number` ou `Array`         | `null` | Filtra a lista de alunos pelo RA
 curso_id  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelos cursos aos quais pertencem
 turma_id   | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelas turmas às quais pertencem
 
+Além dos parâmetros específicos também é possível efetuar a busca pelo parâmetros de Cursos, Turmas e Usuários
+
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/students',
+    url: '/alunos',
     method: 'GET',
     dataType: 'json',
     data: {
         ra: 1,
+        curso_id: 2,
+        name: "nome_aluno"
     },
 });
 ```
@@ -257,11 +261,52 @@ $.ajax({
 ``` json
 {
     "data": [
-        {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
+      {
+     "id": 1,
+     "usuario_id": 1,
+     "ra": 999999999,
+     "usuario": {
+         "id": 1,
+         "email": "email@example.com",
+         "senha": "123",
+         "nome": "John Doe"
+     },
+     "cursos": [
+         {
+             "id": 1,
+             "name": "A",
+             "status": true,
+             "_joinData": {
+                 "id": 1,
+                 "aluno_id": 1,
+                 "curso_id": 1
+             }
+         },
+         {
+             "id": 2,
+             "name": "B",
+             "status": true,
+             "_joinData": {
+                 "id": 2,
+                 "aluno_id": 1,
+                 "curso_id": 2
+             }
+         }
+     ],
+     "turmas": [],
+     "_matchingData": {
+         "Cursos": {
+             "id": 1,
+             "name": "A",
+             "status": true
+         },
+         "AlunosCursos": {
+             "id": 1,
+             "aluno_id": 1,
+             "curso_id": 1
+         }
+     }
+ }
     ]
 }
 ```
@@ -278,7 +323,7 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-    url: '/students/' + studentId,
+    url: '/alunos/' + studentId,
     method: 'GET',
     dataType: 'json',
 });
