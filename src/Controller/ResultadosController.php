@@ -13,7 +13,7 @@ use Cake\ORM\TableRegistry;
  */
 class ResultadosController extends AppController{
 
-  public function getResultados(){
+  public function index(){
     $query = $this->Resultados->find();
     $filter = $this->request->query();
     $query = $query->where($filter);
