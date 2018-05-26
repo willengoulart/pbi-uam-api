@@ -41,6 +41,11 @@ class AlunosTable extends Table
             'foreignKey' => 'usuario_id',
             'joinType' => 'INNER'
         ]);
+
+        $this->belongsToMany('Cursos');
+
+        $this->belongsToMany('Turmas');
+
         $this->hasMany('Resultados', [
             'foreignKey' => 'aluno_id'
         ]);

@@ -15,11 +15,21 @@ class AlunosController extends AppController
 
   public function index()
   {
+      $related = ['Cursos'=>'curso_id', 'Turmas'=>'turma_id'];
+      $relatedFields = ['Cursos'=>'id', 'Turmas'=>'id'];
       $filter_raw = $this->request->query();
       $filter = [];
-      foreach ($filter_raw as $key => $value)
-        $filter[$key.' IN'] = $value;
-      $query = $this->Alunos->find();
+      $query = $this->Alunos->find()->contain(['Turmas', 'Cursos']);
+      foreach ($filter_raw as $key => $value){
+        if(!$model = array_search($key, $related))
+          $filter[$key.' IN'] = $value;
+        else{
+          $query->matching($model, function($q) use($model, $value, $relatedFields){
+            return $q->where(["$model.$relatedFields[$model]"=>$value]);
+          });
+        }
+      }
+
       $query->where($filter);
 
       $cursos = $this->paginate($query);
