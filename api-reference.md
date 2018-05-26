@@ -20,7 +20,7 @@
     - [Informações da categoria](#informações-da-categorias)
 * [Resultados](#resultados)
     - [Buscar resultados](#buscar-resultados)
-    
+
 ## Parâmetros de filtragem
 O PBI utiliza filtros altamente customizáveis para todas as endpoints de lista, a fim de tornar a utilização da API simples e fácil de usar ao mesmo tempo que a torna altamente poderosa, oferecendo liberdade para o utilizador extrair as informações como preferir.
 
@@ -56,7 +56,7 @@ Retorna a lista de cursos cadastrados no sistema baseada nos filtros informados.
 
 ``` javascript
 $.ajax({
-    url: '/courses',
+    url: '/cursos',
     method: 'GET',
     dataType: 'json',
     data: {
@@ -81,7 +81,7 @@ $.ajax({
 
 ### Informações do curso
 
-Retorna informações detalhadas sobre um curso.
+Retorna informações detalhadas sobre um curso acrescidas das turmas e provas.
 
 #### Parâmetros
 
@@ -91,7 +91,7 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-    url: '/courses/' + courseId,
+    url: '/cursos/' + courseId,
     method: 'GET',
     dataType: 'json',
 });
@@ -129,7 +129,7 @@ $.ajax({
             "code": "P1"
         }
     ]
-}
+  }
 }
 ```
 
@@ -137,8 +137,8 @@ $.ajax({
 
 Método                                        | URL                           | Descrição curta
 --------------------------------------------- | ----------------------------- | -----------------
-[Listar turmas](#listar-turmas)               | **GET:** `/classes`           | Retorna a lista de turmas cadastradas no sistema
-[Informações da turma](#informações-da-turma) | **GET:** `/classes/:classId`  | Retorna as informações da turma solicitada
+[Listar turmas](#listar-turmas)               | **GET:** `/turmas`           | Retorna a lista de turmas cadastradas no sistema
+[Informações da turma](#informações-da-turma) | **GET:** `/turmas/:turmaId`  | Retorna as informações da turma solicitada
 
 ### Listar turmas
 
@@ -148,19 +148,21 @@ Retorna a lista de turmas cadastradas no sistema baseada nos filtros informados.
 
 Parâmetro | Tipo                        | Default   | Descrição
 --------- | --------------------------- | --------- |-----------
-status    | `Number` ou `Array`         | 1 (ativo) | Filtra a lista de turmas pelo status
-courseId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de turmas pelos cursos aos quais pertencem
+name      | `String` ou `Array`         | `null` | Filtra a lista de turmas pelo nome
+code  | `String` ou `Array` | `null`    | Filtra a lista de turmas pelo código
+curso_id | `Integer` ou `Array` | `null` | Filtra a lista de turma pelo curso_id
+periodo | `String` ou `Array` | `null`    | Filtra a lista de turmas pelo período
 
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/classes',
+    url: '/turmas',
     method: 'GET',
     dataType: 'json',
     data: {
-        status: 1,
-        courseId: 14,
+        "curso_id": 1,
+        "periodo": "M"
     },
 });
 ```
@@ -170,18 +172,20 @@ $.ajax({
 ``` json
 {
     "data": [
-        {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
+      {
+        "id": 1,
+        "name": "TURMA",
+        "code": "1",
+        "curso_id": 1,
+        "periodo": "M"
+      },
     ]
 }
 ```
 
 ### Informações da turma
 
-Retorna informações detalhadas sobre uma turma.
+Retorna informações detalhadas sobre uma turma, incluídos o curso ao qual a turma pertence.
 
 #### Parâmetros
 
@@ -191,7 +195,7 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-    url: '/classes/' + classId,
+    url: '/turmas/' + turmaId,
     method: 'GET',
     dataType: 'json',
 });
@@ -201,18 +205,18 @@ $.ajax({
 
 ``` json
 {
-    "data": {
-        "id": "Number",
-        "name": "String",
-        "code": "String",
-        "period": "String",
-        "status": "Number",
-        "course": {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
+  {
+    "id": 1,
+    "name": "TURMA",
+    "code": "1",
+    "curso_id": 1,
+    "periodo": "M",
+    "curso": {
+        "id": 1,
+        "name": "A",
+        "status": true
     }
+  }
 }
 ```
 
@@ -220,8 +224,8 @@ $.ajax({
 
 Método                                        | URL                             | Descrição curta
 --------------------------------------------- | ------------------------------- | -----------------
-[Listar alunos](#listar-alunos)               | **GET:** `/students`            | Retorna a lista de alunos cadastradas no sistema
-[Informações do aluno](#informações-do-aluno) | **GET:** `/students/:studentId` | Retorna as informações do aluno solicitado
+[Listar alunos](#listar-alunos)               | **GET:** `/alunos`            | Retorna a lista de alunos cadastradas no sistema
+[Informações do aluno](#informações-do-aluno) | **GET:** `/alunos/:studentId` | Retorna as informações do aluno solicitado
 
 ### Listar alunos
 
@@ -231,9 +235,9 @@ Retorna a lista de alunos cadastrados no sistema baseada nos filtros informados.
 
 Parâmetro | Tipo                        | Default   | Descrição
 --------- | --------------------------- | --------- |-----------
-status    | `Number` ou `Array`         | 1 (ativo) | Filtra a lista de alunos pelo status
-courseId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelos cursos aos quais pertencem
-classId   | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelas turmas às quais pertencem
+ra    | `Number` ou `Array`         | `null` | Filtra a lista de alunos pelo RA
+curso_id  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelos cursos aos quais pertencem
+turma_id   | `Number`, `Array` ou `null` | `null`    | Filtra a lista de alunos pelas turmas às quais pertencem
 
 #### Exemplo de requisição (Ajax)
 
@@ -243,9 +247,7 @@ $.ajax({
     method: 'GET',
     dataType: 'json',
     data: {
-        status: 1,
-        courseId: 14,
-        classId: [25, 26],
+        ra: 1,
     },
 });
 ```
