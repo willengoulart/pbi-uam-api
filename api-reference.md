@@ -559,7 +559,7 @@ $.ajax({
 
 Método                                  | URL                 | Descrição curta
 --------------------------------------- | ------------------- | -----------------
-[Buscar resultados](#buscar-resultados) | **GET:** `/results` | Retorna uma lista de resultados cadastrados no sistema
+[Buscar resultados](#buscar-resultados) | **GET:** `/resultados` | Retorna uma lista de resultados cadastrados no sistema
 
 ### Buscar resultados
 Retorna uma lista de resultados baseada nos filtros informados.
@@ -568,21 +568,21 @@ Retorna uma lista de resultados baseada nos filtros informados.
 
 Parâmetro  | Tipo                        | Default   | Descrição
 ---------- | --------------------------- | --------- |-----------
-testId     | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados pelas provas em que foram usadas
-studentId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados pelos alunos que realizaram a prova
-categoryId | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados pelas categorias às quais pertencem
+prova_ud     | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados pela(s) prova(s)
+categoria_id  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados pela(s) categoria(s)
+aluno_id | `Number`, `Array` ou `null` | `null`    | Filtra a lista de resultados de um aluno
 
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/results',
+    url: '/resultados',
     method: 'GET',
     dataType: 'json',
     data: {
-        testId: 2,
-        studentId: 11,
-        categoryId: [1, 3],
+        prova_id: 2,
+        student_id: 11,
+        category_id: [1, 3],
     },
 });
 ```
@@ -592,29 +592,27 @@ $.ajax({
 ``` json
 {
     "data": [
-        {
-            "id": "Number",
-            "name": "String",
-            "errors": "Number",
-            "hits": "Number",
-            "category": {
-                "id": "Number",
-                "name": "String",
-                "status": "Number",
-            },
-            "test": {
-                "id": "Number",
-                "name": "String",
-                "code": "String",
-                "status": "Number",
-            },
-            "student": {
-                "id": "Number",
-                "name": "String",
-                "ra": "String",
-                "status": "Number"
-            }
-        }
+      {
+      "id": 1,
+      "acertos": 20,
+      "erros": 30,
+      "prova": {
+          "id": 1,
+          "curso_id": 1,
+          "name": "Prova 1",
+          "code": "P1",
+          "turma_id": 1
+      },
+      "categoria": {
+          "id": 1,
+          "name": "Gerais"
+      },
+      "aluno": {
+          "id": 1,
+          "usuario_id": 1,
+          "ra": 99999999
+      }
+    }
     ]
 }
 ```
