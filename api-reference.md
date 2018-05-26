@@ -489,8 +489,8 @@ $.ajax({
 
 Método                                                 | URL                                | Descrição curta
 ------------------------------------------------------ | ---------------------------------- | -----------------
-[Listar categorias](#listar-categorias)                | **GET:** `/categories`             | Retorna a lista de categorias cadastradas no sistema
-[Informações da categoria](#informações-da-categorias) | **GET:** `/categories/:categoryId` | Retorna as informações da categoria solicitada
+[Listar categorias](#listar-categorias)                | **GET:** `/categorias`             | Retorna a lista de categorias cadastradas no sistema
+[Informações da categoria](#informações-da-categorias) | **GET:** `/categorias/:categoriaId` | Retorna as informações da categoria solicitada
 
 ### Listar categorias
 
@@ -500,21 +500,17 @@ Retorna a lista de categorias cadastradas no sistema baseada nos filtros informa
 
 Parâmetro | Tipo                        | Default   | Descrição
 --------- | --------------------------- | --------- |-----------
-status    | `Number` ou `Array`         | 1 (ativo) | Filtra a lista de categorias pelo status
-courseId  | `Number`, `Array` ou `null` | `null`    | Filtra a lista de categorias pelos cursos aos quais pertencem
-testId    | `Number`, `Array` ou `null` | `null`    | Filtra a lista de categorias pelas provas em que foram usadas
+name    | `Number` ou `Array`         | `null` | Filtra a lista de categorias pelo status
 
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/categories',
+    url: '/categorias',
     method: 'GET',
     dataType: 'json',
     data: {
-        status: 1,
-        courseId: 10,
-        testId: 2,
+        name: 'Conhecimentos Gerais',
     },
 });
 ```
@@ -524,11 +520,10 @@ $.ajax({
 ``` json
 {
     "data": [
-        {
-            "id": "Number",
-            "name": "String",
-            "status": "Number"
-        }
+      {
+        "id": 1,
+        "name": "Gerais"
+      }
     ]
 }
 ```
@@ -545,7 +540,7 @@ Este método não suporta parâmetros.
 
 ``` javascript
 $.ajax({
-    url: '/categories/' + categoryId,
+    url: '/categorias/' + categoriaId,
     method: 'GET',
     dataType: 'json',
 });
@@ -555,25 +550,8 @@ $.ajax({
 
 ``` json
 {
-    "data": {
-        "id": "Number",
-        "name": "String",
-        "status": "Number",
-        "courses": [
-            {
-                "id": "Number",
-                "name": "String",
-                "status": "Number"
-            }
-        ],
-        "tests": [
-            {
-                "id": "Number",
-                "name": "String",
-                "status": "Number"
-            }
-        ]
-    }
+    "id": 1,
+    "name": "Gerais"
 }
 ```
 

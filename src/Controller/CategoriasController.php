@@ -29,9 +29,7 @@ class CategoriasController extends AppController
 
   public function view($id = null)
   {
-      $turma = $this->Categorias->get($id, [
-          'contain' => ['Resultados']
-      ]);
+      $turma = $this->Categorias->get($id);
 
       return $this->response->withStringBody(json_encode($turma));
   }
