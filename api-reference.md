@@ -101,11 +101,35 @@ $.ajax({
 
 ``` json
 {
-    "data": {
-        "id": "Number",
-        "name": "String",
-        "status": "Number"
-    }
+   {
+    "id": 1,
+    "name": "A",
+    "status": true,
+    "turmas": [
+        {
+            "id": 1,
+            "name": "TURMA",
+            "code": "1",
+            "curso_id": 1,
+            "periodo": "M"
+        },
+        {
+            "id": 2,
+            "name": "Turma 2",
+            "code": "1",
+            "curso_id": 1,
+            "periodo": "M"
+        }
+    ],
+    "provas": [
+        {
+            "id": 1,
+            "curso_id": 1,
+            "name": "Prova 1",
+            "code": "P1"
+        }
+    ]
+}
 }
 ```
 
