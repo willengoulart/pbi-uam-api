@@ -36,8 +36,7 @@ class TurmasTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Curso', [
-            'className'=>'Cursos',
+        $this->belongsTo('Cursos', [
             'foreignKey' => 'curso_id',
             'joinType' => 'INNER'
         ]);
@@ -86,7 +85,7 @@ class TurmasTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        //$rules->add($rules->existsIn(['curso_id'], 'Cursos'));
+        $rules->add($rules->existsIn(['curso_id'], 'Cursos'));
 
         return $rules;
     }
