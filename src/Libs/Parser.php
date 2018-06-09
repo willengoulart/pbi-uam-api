@@ -5,14 +5,9 @@ namespace App\Libs;
 use Cake\ORM\TableRegistry;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class Parser{
+class Parser {
 
 	private $spreadsheet;
-
-	/* TODO
-		parseAlunos -> usuarioID
-		parseResultados -> categoriaID
-	*/
 
 	function __construct() {
 		$uploadPath = getcwd()."/src/Libs/"; 
@@ -39,13 +34,11 @@ class Parser{
 					$parsedItem = [ 'name'=> $worksheet->getCellByColumnAndRow(3, $row)->getValue() ];
 				}
 				
-				foreach ($parsedData as $item) if ($parsedItem['name'] === $item['name']) continue 2;
+				foreach ($parsedData as $item) if ($parsedItem['name'] == $item['name']) continue 2;
 
 				$this->Cursos = TableRegistry::get('Cursos');
 				$find = $this->Cursos->find()->where(['name'=>$parsedItem['name']]);
-				foreach($find as $item) if ($parsedItem['name'] === $item->name) continue 2;
-
-				$parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}		
 		return $parsedData;
@@ -66,24 +59,20 @@ class Parser{
 				}
 				$this->Cursos = TableRegistry::get('Cursos');
 				$find_curso = ($this->Cursos->find()->where(['name'=>$curso]));
-				$curso_id = null;
-				foreach($find_curso as $item) $curso_id = $item->id; 
-				
-				if (empty($curso_id)) continue;
+				$curso = $find_curso->first();				
+				if (empty($curso)) continue;
 
 				$parsedItem = [
-					'curso_id'=>$curso_id,
+					'curso_id'=>$curso->id,
 					'code'=>$worksheetName,
 					'name'=>$worksheetName
 				];
 				
-				foreach ($parsedData as $item) if ($parsedItem['code'] === $item['code']) continue 2;
+				foreach ($parsedData as $item) if ($parsedItem['code'] == $item['code']) continue 2;
 
 				$this->Provas = TableRegistry::get('Provas');
 				$find = $this->Provas->find()->where(['code'=>$parsedItem['code']]);
-				foreach($find as $item) if ($parsedItem['code'] === $item->code) continue 2;
-
-				$parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}
 		return $parsedData;
@@ -104,10 +93,8 @@ class Parser{
 				}
 				$this->Cursos = TableRegistry::get('Cursos');
 				$find_curso = ($this->Cursos->find()->where(['name'=>$curso]));
-				$curso_id = null;
-				foreach($find_curso as $item) $curso_id = $item->id;
-
-				if (empty($curso_id)) continue;
+				$curso = $find_curso->first();
+				if (empty($curso)) continue;
 
 				if ($worksheetName == 'CCOM_17_1_1') {
 					$parsedItem = [
@@ -122,11 +109,11 @@ class Parser{
 						'periodo'=>$worksheet->getCellByColumnAndRow(4, $row)->getValue(),
 					];
 				}
-				$parsedItem += ['curso_id'=>$curso_id];
+				$parsedItem += ['curso_id'=>$curso->id];
 				
 				foreach ($parsedData as $item) {
-					if ($parsedItem['code'] === $item['code']
-					&& $parsedItem['periodo'] === $item['periodo']) {
+					if ($parsedItem['code'] == $item['code']
+					&& $parsedItem['periodo'] == $item['periodo']) {
 						continue 2;
 					}
 				}
@@ -136,9 +123,7 @@ class Parser{
 					'code'=>$parsedItem['code'],
 					'periodo'=>$parsedItem['periodo']
 				]);
-				foreach($find as $item) if ($parsedItem['code'] === $item->code) continue 2;
-
-				$parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}
 		return $parsedData;
@@ -167,10 +152,11 @@ class Parser{
 				}
 
 				$this->Usuarios = TableRegistry::get('Usuarios');
-				$find = $this->Usuarios->find()->where(['email'=>$parsedItem['email']]);
-				foreach($find as $item) if ($parsedItem['email'] == $item->email) continue 2;
-
-				$parsedData[] = $parsedItem;
+				$find = $this->Usuarios->find()->where([
+					'nome'=>$parsedItem['nome'],
+					'email'=>$parsedItem['email']
+				]);
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}
 		return $parsedData;		
@@ -186,13 +172,11 @@ class Parser{
 				$nome = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
 				$this->Usuarios = TableRegistry::get('Usuarios');
 				$find_usuario = ($this->Usuarios->find()->where(['nome'=>$nome]));
-				$usuario_id = null;
-				foreach($find_usuario as $item) $usuario_id = $item->id; 
-				
-				if (empty($usuario_id)) continue;
+				$usuario = $find_usuario->first();				
+				if (empty($usuario)) continue;
 
 				$parsedItem = [									
-					'usuario_id'=>$usuario_id,
+					'usuario_id'=>$usuario->id,
 					'ra'=>(int) $worksheet->getCellByColumnAndRow(1, $row)->getValue()
 				];
 
@@ -200,9 +184,7 @@ class Parser{
 
 				$this->Alunos = TableRegistry::get('Alunos');
 				$find = $this->Alunos->find()->where(['ra'=>$parsedItem['ra']]);
-				foreach($find as $item) if ($parsedItem['ra'] == $item->ra) continue 2;
-
-				$parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}
 		return $parsedData;
@@ -216,29 +198,23 @@ class Parser{
 		  	$highestRow = $worksheet->getHighestRow();
 
 			for ($row = 3; $row <= $highestRow; $row++) {
-				// Procura dados de outras tabelas no BD
 				$ra = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
 				$this->Alunos = TableRegistry::get('Alunos');
 				$find_aluno = $this->Alunos->find()->where(['ra'=>$ra]);
-				$aluno_id = null;
-				foreach($find_aluno as $item) $aluno_id = $item->id;
+				$aluno = $find_aluno->first();				
+				if (empty($aluno)) continue;
 
 				$this->Provas = TableRegistry::get('Provas');
 				$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
-				$prova_id = null;
-				foreach($find_prova as $item) $prova_id = $item->id;
+				$prova = $find_prova->first();				
+				if (empty($prova)) continue;
 
 				$this->Categorias = TableRegistry::get('Categorias');
 				$find_categoria = $this->Categorias->find()->where(['name'=>$nomeCategoria]);
-				$categoria_id = null;
-				foreach($find_categoria as $item) $categoria_id = $item->id;
+				$categoria = $find_categoria->first();				
+				if (empty($categoria)) continue;
 
-				// Se algo estiver vazio, descartar
-				if (empty($aluno_id) || empty($prova_id) || empty($categoria_id)) continue;
-
-				// Planilha 'CCOM_17_1_1' tem uma coluna a mais
 				if ($worksheetName == 'CCOM_17_1_1') {
-					// Caso tenha errado todas as perguntas, o calculo de quantas perguntas errou com dados de outra linha
 					if ($worksheet->getCellByColumnAndRow(($colunaCategoria+3), $row)->getValue() == 0){
 						$numeroQuestoes = round(100
 						* $worksheet->getCellByColumnAndRow(($colunaCategoria+1), ($row+1))->getValue()
@@ -268,38 +244,27 @@ class Parser{
 					];
 				}
 
-				$parsedItem += [				    
-					'categoria_id'=>$categoria_id,
-					'prova_id'=>$prova_id, 
-					'aluno_id'=>$aluno_id
+				$parsedItem += [			
+					'aluno_id'=>$aluno->id,
+					'prova_id'=>$prova->id, 
+					'categoria_id'=>$categoria->id
 				];
 
-				// Verifica se ha dados duplicados na planilha
 				foreach ($parsedData as $item) {
-					if ($parsedItem['categoria_id'] == $item['categoria_id'] 
-					&& $parsedItem['aluno_id'] == $item['aluno_id']
-					&& $parsedItem['prova_id'] == $item['prova_id']) {
+					if ($parsedItem['aluno_id'] == $item['aluno_id']
+					&& $parsedItem['prova_id'] == $item['prova_id']
+					&& $parsedItem['categoria_id'] == $item['categoria_id']) {
 						continue 2;
 					}
 				}
 
-				// Verifica se ha dados duplicados no BD
 				$this->Resultados = TableRegistry::get('Resultados');
 				$find = $this->Resultados->find()->where([
-					'categoria_id'=>$parsedItem['categoria_id'],
 					'aluno_id'=>$parsedItem['aluno_id'],
-					'prova_id'=>$parsedItem['prova_id']
+					'prova_id'=>$parsedItem['prova_id'],
+					'categoria_id'=>$parsedItem['categoria_id']
 				]);
-				foreach($find as $item) {
-					if ($parsedItem['categoria_id'] === $item->categoria_id
-					&& $parsedItem['aluno_id'] === $item->aluno_id
-					&& $parsedItem['prova_id'] === $item->prova_id){
-						continue 2;
-					}
-				}
-
-				// Adiciona no Array de retorno
-				$parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[] = $parsedItem;
 			}        
 		}		  
 		return $parsedData;
