@@ -24,12 +24,17 @@ class ParserController extends AppController{
 	public function parse(){
 		$time_start = microtime(true);
 
-		$this->parseCursos();
-		$this->parseProvas();
-		$this->parseTurmas();
-		$this->parseUsuarios();
-		$this->parseAlunos();
-		$this->createCategorias();
+		$this->parseCursos(); // 0.1s
+		$this->parseProvas(); // 1.44s
+		$this->parseTurmas(); // 3.3s
+		$time_start = microtime(true);
+		$this->parseUsuarios(); // 30s
+		$time_end = microtime(true);
+		$time = $time_end - $time_start;
+		echo "<br>Importacao demorou " . $time . " segundos";
+		$this->parseAlunos(); // 4s
+		$this->createCategorias(); // 0s
+		exit;
 		$this->parseResultados("Conhecimentos Especificos", 7);
 		$this->parseResultados("Conhecimentos Gerais", 10);
 		$this->parseResultados("Total", 13);

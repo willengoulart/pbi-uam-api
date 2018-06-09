@@ -10,7 +10,7 @@ class Parser {
 	private $spreadsheet;
 
 	function __construct() {
-		$uploadPath = getcwd()."/src/Libs/"; 
+		$uploadPath = APP."Libs/";
 		$filename = "DadosTP_mask.xlsx"; 
 		$inputFileName = $uploadPath . $filename;		
 	  	$inputFileType = IOFactory::identify($inputFileName);
@@ -144,11 +144,8 @@ class Parser {
 					'senha' => hash("sha256", $ra)
 				];
 
-				foreach ($parsedData as $item) {
-					if ($parsedItem['email'] == $item['email']
-					&& $parsedItem['nome'] == $item['nome']) {
-						continue 2;
-					}
+				if (isset($parsedData[$parsedItem['email']])) {
+					continue 2;
 				}
 
 				$this->Usuarios = TableRegistry::get('Usuarios');
@@ -156,7 +153,7 @@ class Parser {
 					'nome'=>$parsedItem['nome'],
 					'email'=>$parsedItem['email']
 				]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[$parsedItem['email']] = $parsedItem;
 			}        
 		}
 		return $parsedData;		
