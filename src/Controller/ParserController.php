@@ -18,7 +18,6 @@ class ParserController extends AppController{
 
 	public function initialize() {
 		$this->parser = new Parser();
-		$this->parse();
 	}
 
 	public function parse(){
@@ -52,10 +51,6 @@ class ParserController extends AppController{
 		$this->parseResultados("Conhecimentos Gerais", 10);
 		$time_resultados2 = microtime(true);
 		echo "<br>Resultados2: " . ($time_resultados2-$time_resultados1) . " segundos";
-		
-		$this->parseResultados("Total", 13);
-		$time_resultados3 = microtime(true);
-		echo "<br>Resultados3: " . ($time_resultados3-$time_resultados2) . " segundos";
 				
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
@@ -64,8 +59,7 @@ class ParserController extends AppController{
 
 	public function createCategorias(){
 		$categorias = [['name' => "Conhecimentos Especificos"],
-			['name' => "Conhecimentos Gerais"],
-			['name' => "Total"]];
+			['name' => "Conhecimentos Gerais"]];
 		$this->Categorias = TableRegistry::get('Categorias');
 		
 		foreach($categorias as $cat) {
@@ -110,8 +104,15 @@ class ParserController extends AppController{
 		if (!empty($parsed_data)) {
 			$this->Usuarios = TableRegistry::get('Usuarios');
 			$parsed_obj = $this->Usuarios->newEntities($parsed_data);
-			// $this->Usuarios->saveMany($parsed_obj);
-			foreach ($parsed_obj as $item) $this->Usuarios->save($item);
+
+			if(!$this->Usuarios->saveMany($parsed_obj)){
+				foreach ($parsed_obj as $key => $value) {
+					if($erros = $value->errors()){
+						echo "Usuário ".$value->nome . "(Email: ".$value->email.") 
+						possui dados incompletos<br>";
+					}
+				}
+			}
 		}
 	}
 

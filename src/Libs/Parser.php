@@ -133,31 +133,46 @@ class Parser {
 	}
 
 	public function parseUsuarios() {
+
 		$parsedData = [];
 
+		$this->Usuarios = TableRegistry::get('Usuarios');
+
+
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
-		  	$highestRow = $worksheet->getHighestRow();
 
-			for ($row = 3; $row <= $highestRow; $row++) {
-				$ra = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
+		  	$worksheetArray = $worksheet->toArray();
 
+			$i = 0;
+			foreach ($worksheetArray as $row) {
+				if($i < 2){ $i++; continue;}
+				$ra = $row[0]; // Coluna 0 é Matrícula				
 				$parsedItem = [			
 					'email' => $ra . "@anhembimorumbi.edu.br",
-					'nome' => $worksheet->getCellByColumnAndRow(2, $row)->getValue(),
+					'nome' => $row[1], // Coluna 1 é Nome
 					'senha' => hash("sha256", $ra)
 				];
 
 				if (isset($parsedData[$parsedItem['email']])) continue;
+				$parsedData[$parsedItem['email']] = $parsedItem;
+			}
 
-				$this->Usuarios = TableRegistry::get('Usuarios');
-				$find = $this->Usuarios->find()->where([
-					'nome'=>$parsedItem['nome'],
-					'email'=>$parsedItem['email']
-				]);
-				if ($find->isEmpty()) $parsedData[$parsedItem['email']] = $parsedItem;
-			}        
 		}
-		return $parsedData;		
+
+		unset($worksheetArray);
+
+		$find = $this->Usuarios->find('list', ['valueField'=>"email"])->
+				where(['email IN'=>array_keys($parsedData)])->
+				toArray();
+
+		foreach($find as $item){
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
+		}
+
+		
+
+		return $parsedData;
 	}
 
 	public function parseAlunos() {
@@ -188,7 +203,7 @@ class Parser {
 		return $parsedData;
 	}
 
-	public function parseResultados(string $nomeCategoria, int $colunaCategoria) {	
+	public function parseResultados($nomeCategoria, $colunaCategoria) {	
 		$parsedData = [];
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
@@ -267,7 +282,7 @@ class Parser {
 						$parsedItem['categoria_id']
 					] = $parsedItem;
 				}
-			}        
+			}  
 		}		  
 		return $parsedData;
 	}
