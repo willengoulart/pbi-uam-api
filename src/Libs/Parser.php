@@ -34,11 +34,11 @@ class Parser {
 					$parsedItem = [ 'name'=> $worksheet->getCellByColumnAndRow(3, $row)->getValue() ];
 				}
 				
-				foreach ($parsedData as $item) if ($parsedItem['name'] == $item['name']) continue 2;
+				if (isset($parsedData[$parsedItem['name']])) continue;
 
 				$this->Cursos = TableRegistry::get('Cursos');
 				$find = $this->Cursos->find()->where(['name'=>$parsedItem['name']]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[$parsedItem['name']] = $parsedItem;
 			}        
 		}		
 		return $parsedData;
@@ -68,11 +68,11 @@ class Parser {
 					'name'=>$worksheetName
 				];
 				
-				foreach ($parsedData as $item) if ($parsedItem['code'] == $item['code']) continue 2;
+				if (isset($parsedData[$parsedItem['code']])) continue;
 
 				$this->Provas = TableRegistry::get('Provas');
 				$find = $this->Provas->find()->where(['code'=>$parsedItem['code']]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[$parsedItem['code']] = $parsedItem;
 			}        
 		}
 		return $parsedData;
@@ -111,19 +111,22 @@ class Parser {
 				}
 				$parsedItem += ['curso_id'=>$curso->id];
 				
-				foreach ($parsedData as $item) {
-					if ($parsedItem['code'] == $item['code']
-					&& $parsedItem['periodo'] == $item['periodo']) {
-						continue 2;
-					}
-				}
+				if (isset($parsedData[
+					$parsedItem['code'] . '-' .
+					$parsedItem['periodo']
+				])) continue;
 
 				$this->Turmas = TableRegistry::get('Turmas');
 				$find = $this->Turmas->find()->where([
 					'code'=>$parsedItem['code'],
 					'periodo'=>$parsedItem['periodo']
 				]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) {
+					$parsedData[
+						$parsedItem['code'] . '-' .
+						$parsedItem['periodo']
+					] = $parsedItem;
+				}
 			}        
 		}
 		return $parsedData;
@@ -144,9 +147,7 @@ class Parser {
 					'senha' => hash("sha256", $ra)
 				];
 
-				if (isset($parsedData[$parsedItem['email']])) {
-					continue 2;
-				}
+				if (isset($parsedData[$parsedItem['email']])) continue;
 
 				$this->Usuarios = TableRegistry::get('Usuarios');
 				$find = $this->Usuarios->find()->where([
@@ -177,11 +178,11 @@ class Parser {
 					'ra'=>(int) $worksheet->getCellByColumnAndRow(1, $row)->getValue()
 				];
 
-				foreach ($parsedData as $item) if ($parsedItem['ra'] == $item['ra']) continue 2;
+				if (isset($parsedData[$parsedItem['ra']])) continue;
 
 				$this->Alunos = TableRegistry::get('Alunos');
 				$find = $this->Alunos->find()->where(['ra'=>$parsedItem['ra']]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) $parsedData[$parsedItem['ra']] = $parsedItem;
 			}        
 		}
 		return $parsedData;
@@ -247,13 +248,11 @@ class Parser {
 					'categoria_id'=>$categoria->id
 				];
 
-				foreach ($parsedData as $item) {
-					if ($parsedItem['aluno_id'] == $item['aluno_id']
-					&& $parsedItem['prova_id'] == $item['prova_id']
-					&& $parsedItem['categoria_id'] == $item['categoria_id']) {
-						continue 2;
-					}
-				}
+				if (isset($parsedData[
+					$parsedItem['aluno_id'] . '-' . 
+					$parsedItem['prova_id'] . '-' . 
+					$parsedItem['categoria_id']
+				])) continue;
 
 				$this->Resultados = TableRegistry::get('Resultados');
 				$find = $this->Resultados->find()->where([
@@ -261,7 +260,13 @@ class Parser {
 					'prova_id'=>$parsedItem['prova_id'],
 					'categoria_id'=>$parsedItem['categoria_id']
 				]);
-				if ($find->isEmpty()) $parsedData[] = $parsedItem;
+				if ($find->isEmpty()) {
+					$parsedData[
+						$parsedItem['aluno_id'] . '-' . 
+						$parsedItem['prova_id'] . '-' . 
+						$parsedItem['categoria_id']
+					] = $parsedItem;
+				}
 			}        
 		}		  
 		return $parsedData;

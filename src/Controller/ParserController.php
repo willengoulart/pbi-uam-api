@@ -24,20 +24,38 @@ class ParserController extends AppController{
 	public function parse(){
 		$time_start = microtime(true);
 
-		$this->parseCursos(); // 0.1s
-		$this->parseProvas(); // 1.44s
-		$this->parseTurmas(); // 3.3s
-		$time_start = microtime(true);
-		$this->parseUsuarios(); // 30s
-		$time_end = microtime(true);
-		$time = $time_end - $time_start;
-		echo "<br>Importacao demorou " . $time . " segundos";
-		$this->parseAlunos(); // 4s
-		$this->createCategorias(); // 0s
-		exit;
+		$this->parseCursos();
+		$time_cursos = microtime(true);
+		echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
+
+		$this->parseProvas();
+		$time_provas = microtime(true);
+		echo "<br>Provas: " . ($time_provas-$time_cursos) . " segundos";
+
+		$this->parseTurmas();
+		$time_turmas = microtime(true);
+		echo "<br>Turmas: " . ($time_turmas-$time_provas) . " segundos";
+		
+		$this->parseUsuarios();
+		$time_usuarios = microtime(true);
+		echo "<br>Usuarios: " . ($time_usuarios-$time_turmas) . " segundos";
+
+		$this->parseAlunos();
+		$time_alunos = microtime(true);
+		echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
+
+		$this->createCategorias();
 		$this->parseResultados("Conhecimentos Especificos", 7);
+		$time_resultados1 = microtime(true);
+		echo "<br>Resultados1: " . ($time_resultados1-$time_alunos) . " segundos";
+
 		$this->parseResultados("Conhecimentos Gerais", 10);
+		$time_resultados2 = microtime(true);
+		echo "<br>Resultados2: " . ($time_resultados2-$time_resultados1) . " segundos";
+		
 		$this->parseResultados("Total", 13);
+		$time_resultados3 = microtime(true);
+		echo "<br>Resultados3: " . ($time_resultados3-$time_resultados2) . " segundos";
 				
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
