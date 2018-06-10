@@ -36,6 +36,7 @@ class Parser {
 					$parsedItem = [ 'name'=> $row[2] ];
 				}
 				
+				if (isset($parsedData[$parsedItem['name']])) continue;
 				$parsedData[$parsedItem['name']] = $parsedItem;
 			}        
 		}
@@ -78,6 +79,7 @@ class Parser {
 					'name'=>$worksheetName
 				];
 				
+				if (isset($parsedData[$parsedItem['code']])) continue;
 				$parsedData[$parsedItem['code']] = $parsedItem;
 			}        
 		}
@@ -129,6 +131,12 @@ class Parser {
 				}
 				$parsedItem += ['curso_id'=>$curso->id];
 
+				if (isset($parsedData[
+					$parsedItem['code'] . '-' . 
+					$parsedItem['curso_id'] . '-' .
+					$parsedItem['periodo']
+				])) continue;
+				
 				$parsedData[
 					$parsedItem['code'] . '-' . 
 					$parsedItem['curso_id'] . '-' .
@@ -159,19 +167,21 @@ class Parser {
 
 	public function parseUsuarios() {
 		$parsedData = [];
+		$this->Usuarios = TableRegistry::get('Usuarios');
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
 			$i = 0;
 
 			foreach ($worksheet->toArray() as $row) {
 				if($i < 2){ $i++; continue; }
-
+				$ra = $row[0]; 				
 				$parsedItem = [			
 					'email' => $row[0] . "@anhembimorumbi.edu.br",
 					'nome' => $row[1],
 					'senha' => hash("sha256", $row[0])
 				];
 
+				if (isset($parsedData[$parsedItem['email']])) continue;
 				$parsedData[$parsedItem['email']] = $parsedItem;
 			}        
 		}
@@ -209,6 +219,7 @@ class Parser {
 					'ra'=>(int) $row[0]
 				];
 
+				if (isset($parsedData[$parsedItem['ra']])) continue;
 				$parsedData[$parsedItem['ra']] = $parsedItem;
 			}        
 		}
@@ -298,6 +309,12 @@ class Parser {
 					'aluno_id'=>$aluno->id,
 					'prova_id'=>$prova->id,  
 				];
+
+				if (isset($parsedData[
+					$parsedItem['aluno_id'] . '-' . 
+					$parsedItem['prova_id'] . '-' . 
+					$parsedItem['categoria_id']
+				])) continue;
 				
 				$parsedData[
 					$parsedItem['aluno_id'] . '-' . 
