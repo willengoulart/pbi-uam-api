@@ -146,21 +146,24 @@ class Parser {
 		}
 		
 		$this->Turmas = TableRegistry::get('Turmas');
-		$find = $this->Turmas->find('list', ['valueField'=>"code-curso_id-periodo"])->
-			where([
-				'code-curso_id-periodo IN'=>array_keys($parsedData)
-			]);
-		$find->select(['code-curso_id' => $find->func()->
+		$find = $this->Turmas->find('list', ['valueField'=>"code-curso_id-periodo"]);
+		$find->select(['code-curso_id-periodo' => $find->func()->
 			concat([
 				'code' => 'identifier', '-', 
 				'curso_id' => 'identifier', '-', 
 				'periodo' => 'identifier'
-			])]);
+			])])
+			->where([
+				'code-curso_id-periodo IN'=>array_keys($parsedData)
+			]);
+		// pr($find);
 		$find = $find->toArray();
+		// pr($find);
 
-		foreach($find as $item)
+		foreach($find as $item) {
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
+		}
 
 		return $parsedData;
 	}
@@ -242,72 +245,49 @@ class Parser {
 		$this->Alunos = TableRegistry::get('Alunos');
 		$this->Provas = TableRegistry::get('Provas');
 		$this->Categorias = TableRegistry::get('Categorias');
+			
+		$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Especificos"]);
+		$catEspec = $find_categoria->first()->id;
+
+		$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Gerais"]);
+		$catGeral = $find_categoria->first()->id;
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
 			$i = 0;
 			$worksheetName = $worksheet->getTitle();
 
+			$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
+			$prova = $find_prova->first();				
+			if (empty($prova)) continue;
+			$prova = $prova->id;	
+
 			foreach ($worksheet->toArray() as $row) {
-				if($i < 2){ $i++; continue; }
+				if ($i < 2) { $i++; continue; }
 
 				$find_aluno = $this->Alunos->find()->where(['ra'=>$row[0]]);
 				$aluno = $find_aluno->first();				
 				if (empty($aluno)) continue;
 
-				$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
-				$prova = $find_prova->first();				
-				if (empty($prova)) continue;
+				$col = ($worksheetName == 'CCOM_17_1_1') ? 7 : 6;
 
-				$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Especificos"]);
-				$categoria = $find_categoria->first();				
-				if (empty($categoria)) continue;
-
-				if ($worksheetName == 'CCOM_17_1_1') {
-					$tmp = 7;
+				if ($row[$col] == 0) {
+					foreach($parsedData as $item) {
+						if ($item['acertos'] > 0 && $item['categoria_id'] == $catEspec) {
+							$numeroQuestoes = $item['acertos'] + $item['erros'];
+						}
+					}
 				} else {
-					$tmp = 6;
+					$numeroQuestoes = round(100
+					* $row[$col]
+					/ $row[$col+2]);
 				}
 				
-				$numeroQuestoes = round(100
-				* $row[$tmp]
-				/ $row[$tmp+2]);
-				
 				$parsedItem = [	
-					'acertos'=>(int) $row[$tmp], 
-					'erros'=>(int) ($numeroQuestoes - $row[$tmp]),
-					'categoria_id'=>$categoria->id,		
-					'aluno_id'=>$aluno->id,
-					'prova_id'=>$prova->id,  
-				];
-				
-				$parsedData[
-					$parsedItem['aluno_id'] . '-' . 
-					$parsedItem['prova_id'] . '-' . 
-					$parsedItem['categoria_id']
-				] = $parsedItem;
-
-				/**********************************************************************/
-
-				$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Gerais"]);
-				$categoria = $find_categoria->first();				
-				if (empty($categoria)) continue;
-
-				if ($worksheetName == 'CCOM_17_1_1') {
-					$tmp = 10;
-				} else {
-					$tmp = 9;
-				}
-				
-				$numeroQuestoes = round(100
-				* $row[$tmp]
-				/ $row[$tmp+2]);
-				
-				$parsedItem = [	
-					'acertos'=>(int) $row[$tmp], 
-					'erros'=>(int) ($numeroQuestoes - $row[$tmp]),
-					'categoria_id'=>$categoria->id,		
-					'aluno_id'=>$aluno->id,
-					'prova_id'=>$prova->id,  
+					'acertos' => (int) $row[$col], 
+					'erros' => (int) ($numeroQuestoes - $row[$col]),
+					'categoria_id' => $catEspec,		
+					'prova_id' => $prova,  
+					'aluno_id' => $aluno->id,
 				];
 
 				if (isset($parsedData[
@@ -321,20 +301,50 @@ class Parser {
 					$parsedItem['prova_id'] . '-' . 
 					$parsedItem['categoria_id']
 				] = $parsedItem;
+
+				/**********************************************************************/
+
+				$col = ($worksheetName == 'CCOM_17_1_1') ? 10 : 9;
+				
+				if ($row[$col] == 0) {
+					foreach($parsedData as $item) {
+						if ($item['acertos'] > 0 && $item['categoria_id'] == $catGeral) {
+							$numeroQuestoes = $item['acertos'] + $item['erros'];
+						}
+					}
+				} else {
+					$numeroQuestoes = round(100
+					* $row[$col]
+					/ $row[$col+2]);
+				}
+				
+				$parsedItem = [	
+					'acertos' => (int) $row[$col], 
+					'erros' => (int) ($numeroQuestoes - $row[$col]),
+					'categoria_id' => $catGeral,
+					'prova_id' => $prova,  		
+					'aluno_id' => $aluno->id,
+				];
+				
+				$parsedData[
+					$parsedItem['aluno_id'] . '-' . 
+					$parsedItem['prova_id'] . '-' . 
+					$parsedItem['categoria_id']
+				] = $parsedItem;
 			}        
 		}		
 		
 		$this->Resultados = TableRegistry::get('Resultados');
-		$find = $this->Resultados->find('list', ['valueField'=>"aluno_id-prova_id-categoria_id"])->
-			where([
-				'aluno_id-prova_id-categoria_id IN'=>array_keys($parsedData)
-			]);
+		$find = $this->Resultados->find('list', ['valueField'=>"aluno_id-prova_id-categoria_id"]);
 		$find->select(['aluno_id-prova_id-categoria_id' => $find->func()->
 			concat([
 				'aluno_id'=>'identifier', '-', 
 				'prova_id'=>'identifier', '-', 
 				'categoria_id'=>'identifier'
-			])]);
+			])])
+			->where([
+				'aluno_id-prova_id-categoria_id IN'=>array_keys($parsedData)
+			]);;
 		// pr($find);
 		$find = $find->toArray();
 		// pr($find);
@@ -342,8 +352,6 @@ class Parser {
 		foreach($find as $item)
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
-
-		// pr($parsedData);
 
 		return $parsedData;
 	}
