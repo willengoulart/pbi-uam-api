@@ -45,6 +45,14 @@ class AppController extends Controller
         $this->loadComponent('Flash');
         $this->autoRender = false;
         $this->response = $this->response->withType('application/json');
+        $this->response->cors($this->request)
+            ->allowOrigin(['*'])
+            ->allowMethods(['*'])
+            ->allowHeaders(['X-CSRF-Token'])
+            ->allowCredentials()
+            ->exposeHeaders(['Link'])
+            ->maxAge(300)
+            ->build();
 
         /*
          * Enable the following components for recommended CakePHP security settings.
