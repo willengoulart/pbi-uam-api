@@ -44,13 +44,10 @@ class ParserController extends AppController{
 		echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
 
 		$this->createCategorias();
-		$this->parseResultados("Conhecimentos Especificos", 7);
-		$time_resultados1 = microtime(true);
-		echo "<br>Resultados1: " . ($time_resultados1-$time_alunos) . " segundos";
 
-		$this->parseResultados("Conhecimentos Gerais", 10);
-		$time_resultados2 = microtime(true);
-		echo "<br>Resultados2: " . ($time_resultados2-$time_resultados1) . " segundos";
+		$this->parseResultados();
+		$time_resultados = microtime(true);
+		echo "<br>Resultados: " . ($time_resultados-$time_alunos) . " segundos";
 				
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
@@ -58,8 +55,10 @@ class ParserController extends AppController{
 	}
 
 	public function createCategorias(){
-		$categorias = [['name' => "Conhecimentos Especificos"],
-			['name' => "Conhecimentos Gerais"]];
+		$categorias = [
+			['name' => "Conhecimentos Especificos"],
+			['name' => "Conhecimentos Gerais"]
+		];
 		$this->Categorias = TableRegistry::get('Categorias');
 		
 		foreach($categorias as $cat) {
@@ -104,12 +103,12 @@ class ParserController extends AppController{
 		if (!empty($parsed_data)) {
 			$this->Usuarios = TableRegistry::get('Usuarios');
 			$parsed_obj = $this->Usuarios->newEntities($parsed_data);
-
+			// foreach ($parsed_obj as $item) $this->Usuarios->save($item);
 			if(!$this->Usuarios->saveMany($parsed_obj)){
 				foreach ($parsed_obj as $key => $value) {
 					if($erros = $value->errors()){
-						echo "Usuário ".$value->nome . "(Email: ".$value->email.") 
-						possui dados incompletos<br>";
+						echo "<br>Usuário " . $value->nome . " (Email: ".$value->email.") 
+						possui dados incompletos";
 					}
 				}
 			}
@@ -125,8 +124,8 @@ class ParserController extends AppController{
 		}
 	}
 
-	public function parseResultados($nomeCategoria, $colunaCategoria){
-		$parsed_data = $this->parser->parseResultados($nomeCategoria, $colunaCategoria);
+	public function parseResultados() {
+		$parsed_data = $this->parser->parseResultados();
 		if (!empty($parsed_data)) {
 			$this->Resultados = TableRegistry::get('Resultados');
 			$parsed_obj = $this->Resultados->newEntities($parsed_data);

@@ -24,40 +24,51 @@ class Parser {
 		$parsedData = [];
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$i = 0;
 			$worksheetName = $worksheet->getTitle();
-		  	$highestRow = $worksheet->getHighestRow();
 
-			for ($row = 3; $row <= $highestRow; $row++) {
+			foreach ($worksheet->toArray() as $row) {
+				if($i < 2){ $i++; continue; }
+
 				if ($worksheetName == 'CCOM_17_1_1') {	
-					$parsedItem = [ 'name'=> $worksheet->getCellByColumnAndRow(4, $row)->getValue() ];
+					$parsedItem = [ 'name'=> $row[3] ];
 				} else {
-					$parsedItem = [ 'name'=> $worksheet->getCellByColumnAndRow(3, $row)->getValue() ];
+					$parsedItem = [ 'name'=> $row[2] ];
 				}
 				
 				if (isset($parsedData[$parsedItem['name']])) continue;
-
-				$this->Cursos = TableRegistry::get('Cursos');
-				$find = $this->Cursos->find()->where(['name'=>$parsedItem['name']]);
-				if ($find->isEmpty()) $parsedData[$parsedItem['name']] = $parsedItem;
+				$parsedData[$parsedItem['name']] = $parsedItem;
 			}        
-		}		
-		return $parsedData;
+		}
+		
+		$this->Cursos = TableRegistry::get('Cursos');
+		$find = $this->Cursos->find('list', ['valueField'=>"name"])->
+			where(['name IN'=>array_keys($parsedData)])->
+			toArray();
+
+		foreach($find as $item)
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
+
+		return $parsedData;		
 	}
 
 	public function parseProvas() {
 		$parsedData = [];
+		$this->Cursos = TableRegistry::get('Cursos');
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$i = 0;
 			$worksheetName = $worksheet->getTitle();
-		  	$highestRow = $worksheet->getHighestRow();
 
-			for ($row = 3; $row <= $highestRow; $row++) {
+			foreach ($worksheet->toArray() as $row) {
+				if($i < 2){ $i++; continue; }
+
 				if ($worksheetName == 'CCOM_17_1_1') {
-					$curso = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
+					$curso = $row[3];
 				} else {
-					$curso = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
+					$curso = $row[2];
 				}
-				$this->Cursos = TableRegistry::get('Cursos');
 				$find_curso = ($this->Cursos->find()->where(['name'=>$curso]));
 				$curso = $find_curso->first();				
 				if (empty($curso)) continue;
@@ -69,198 +80,214 @@ class Parser {
 				];
 				
 				if (isset($parsedData[$parsedItem['code']])) continue;
-
-				$this->Provas = TableRegistry::get('Provas');
-				$find = $this->Provas->find()->where(['code'=>$parsedItem['code']]);
-				if ($find->isEmpty()) $parsedData[$parsedItem['code']] = $parsedItem;
+				$parsedData[$parsedItem['code']] = $parsedItem;
 			}        
 		}
-		return $parsedData;
+		
+		$this->Provas = TableRegistry::get('Provas');
+		$find = $this->Provas->find('list', ['valueField'=>"code"])->
+			where(['code IN'=>array_keys($parsedData)])->
+			toArray();
+
+		foreach($find as $item)
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
+
+		return $parsedData;		
 	}
 
 	public function parseTurmas() {
 		$parsedData = [];
+		$this->Cursos = TableRegistry::get('Cursos');
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$i = 0;
 			$worksheetName = $worksheet->getTitle();
-		  	$highestRow = $worksheet->getHighestRow();
 
-			for ($row = 3; $row <= $highestRow; $row++) {
+			foreach ($worksheet->toArray() as $row) {
+				if($i < 2){ $i++; continue; }
+
 				if ($worksheetName == 'CCOM_17_1_1') {
-					$curso = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
+					$curso = $row[3];
 				} else {
-					$curso = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
+					$curso = $row[2];
 				}
-				$this->Cursos = TableRegistry::get('Cursos');
 				$find_curso = ($this->Cursos->find()->where(['name'=>$curso]));
 				$curso = $find_curso->first();
 				if (empty($curso)) continue;
 
 				if ($worksheetName == 'CCOM_17_1_1') {
 					$parsedItem = [
-						'code'=>$worksheet->getCellByColumnAndRow(6, $row)->getValue(),
-						'name'=>$worksheet->getCellByColumnAndRow(6, $row)->getValue(),
-						'periodo'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
+						'code'=>$row[5],
+						'name'=>$row[5],
+						'periodo'=>$row[4],
 					];
 				} else {
 					$parsedItem = [
-						'code'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
-						'name'=>$worksheet->getCellByColumnAndRow(5, $row)->getValue(),
-						'periodo'=>$worksheet->getCellByColumnAndRow(4, $row)->getValue(),
+						'code'=>$row[4],
+						'name'=>$row[4],
+						'periodo'=>$row[3],
 					];
 				}
 				$parsedItem += ['curso_id'=>$curso->id];
-				
+
 				if (isset($parsedData[
-					$parsedItem['code'] . '-' .
+					$parsedItem['code'] . '-' . 
+					$parsedItem['curso_id'] . '-' .
 					$parsedItem['periodo']
 				])) continue;
-
-				$this->Turmas = TableRegistry::get('Turmas');
-				$find = $this->Turmas->find()->where([
-					'code'=>$parsedItem['code'],
-					'periodo'=>$parsedItem['periodo']
-				]);
-				if ($find->isEmpty()) {
-					$parsedData[
-						$parsedItem['code'] . '-' .
-						$parsedItem['periodo']
-					] = $parsedItem;
-				}
+				
+				$parsedData[
+					$parsedItem['code'] . '-' . 
+					$parsedItem['curso_id'] . '-' .
+					$parsedItem['periodo']
+				] = $parsedItem;
 			}        
 		}
-		return $parsedData;
-	}
+		
+		$this->Turmas = TableRegistry::get('Turmas');
+		$find = $this->Turmas->find('list', ['valueField'=>"code-curso_id-periodo"]);
+		$find->select(['code-curso_id-periodo' => $find->func()->
+			concat([
+				'code' => 'identifier', '-', 
+				'curso_id' => 'identifier', '-', 
+				'periodo' => 'identifier'
+			])])
+			->where([
+				'code-curso_id-periodo IN'=>array_keys($parsedData)
+			]);
+		// pr($find);
+		$find = $find->toArray();
+		// pr($find);
 
-	public function parseUsuarios() {
-
-		$parsedData = [];
-
-		$this->Usuarios = TableRegistry::get('Usuarios');
-
-
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
-
-		  	$worksheetArray = $worksheet->toArray();
-
-			$i = 0;
-			foreach ($worksheetArray as $row) {
-				if($i < 2){ $i++; continue;}
-				$ra = $row[0]; // Coluna 0 é Matrícula				
-				$parsedItem = [			
-					'email' => $ra . "@anhembimorumbi.edu.br",
-					'nome' => $row[1], // Coluna 1 é Nome
-					'senha' => hash("sha256", $ra)
-				];
-
-				if (isset($parsedData[$parsedItem['email']])) continue;
-				$parsedData[$parsedItem['email']] = $parsedItem;
-			}
-
-		}
-
-		unset($worksheetArray);
-
-		$find = $this->Usuarios->find('list', ['valueField'=>"email"])->
-				where(['email IN'=>array_keys($parsedData)])->
-				toArray();
-
-		foreach($find as $item){
+		foreach($find as $item) {
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
 		}
 
+		return $parsedData;
+	}
+
+	public function parseUsuarios() {
+		$parsedData = [];
+		$this->Usuarios = TableRegistry::get('Usuarios');
+
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$i = 0;
+
+			foreach ($worksheet->toArray() as $row) {
+				if($i < 2){ $i++; continue; }
+				$ra = $row[0]; 				
+				$parsedItem = [			
+					'email' => $row[0] . "@anhembimorumbi.edu.br",
+					'nome' => $row[1],
+					'senha' => hash("sha256", $row[0])
+				];
+
+				if (isset($parsedData[$parsedItem['email']])) continue;
+				$parsedData[$parsedItem['email']] = $parsedItem;
+			}        
+		}
+		
+		$this->Usuarios = TableRegistry::get('Usuarios');
+		$find = $this->Usuarios->find('list', ['valueField'=>"email"])->
+			where(['email IN'=>array_keys($parsedData)])->
+			toArray();
+
+		foreach($find as $item)
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
 		
 
-		return $parsedData;
+		return $parsedData;		
 	}
 
 	public function parseAlunos() {
 		$parsedData = [];
+		$this->Usuarios = TableRegistry::get('Usuarios');
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
-		  	$highestRow = $worksheet->getHighestRow();
+			$i = 0;
 
-			for ($row = 3; $row <= $highestRow; $row++) {
-				$nome = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
-				$this->Usuarios = TableRegistry::get('Usuarios');
+			foreach ($worksheet->toArray() as $row) {
+				if($i < 2){ $i++; continue; }
+
+				$nome = $row[1];
 				$find_usuario = ($this->Usuarios->find()->where(['nome'=>$nome]));
 				$usuario = $find_usuario->first();				
 				if (empty($usuario)) continue;
 
 				$parsedItem = [									
 					'usuario_id'=>$usuario->id,
-					'ra'=>(int) $worksheet->getCellByColumnAndRow(1, $row)->getValue()
+					'ra'=>(int) $row[0]
 				];
 
 				if (isset($parsedData[$parsedItem['ra']])) continue;
-
-				$this->Alunos = TableRegistry::get('Alunos');
-				$find = $this->Alunos->find()->where(['ra'=>$parsedItem['ra']]);
-				if ($find->isEmpty()) $parsedData[$parsedItem['ra']] = $parsedItem;
+				$parsedData[$parsedItem['ra']] = $parsedItem;
 			}        
 		}
+		
+		$this->Alunos = TableRegistry::get('Alunos');
+		$find = $this->Alunos->find('list', ['valueField'=>"ra"])->
+			where(['ra IN'=>array_keys($parsedData)])->
+			toArray();
+
+		foreach($find as $item)
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
+		
+
 		return $parsedData;
 	}
 
-	public function parseResultados($nomeCategoria, $colunaCategoria) {	
+	public function parseResultados() {	
 		$parsedData = [];
+		$this->Alunos = TableRegistry::get('Alunos');
+		$this->Provas = TableRegistry::get('Provas');
+		$this->Categorias = TableRegistry::get('Categorias');
+			
+		$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Especificos"]);
+		$catEspec = $find_categoria->first()->id;
+
+		$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Gerais"]);
+		$catGeral = $find_categoria->first()->id;
 
 		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$i = 0;
 			$worksheetName = $worksheet->getTitle();
-		  	$highestRow = $worksheet->getHighestRow();
 
-			for ($row = 3; $row <= $highestRow; $row++) {
-				$ra = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
-				$this->Alunos = TableRegistry::get('Alunos');
-				$find_aluno = $this->Alunos->find()->where(['ra'=>$ra]);
+			$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
+			$prova = $find_prova->first();				
+			if (empty($prova)) continue;
+			$prova = $prova->id;	
+
+			foreach ($worksheet->toArray() as $row) {
+				if ($i < 2) { $i++; continue; }
+
+				$find_aluno = $this->Alunos->find()->where(['ra'=>$row[0]]);
 				$aluno = $find_aluno->first();				
 				if (empty($aluno)) continue;
 
-				$this->Provas = TableRegistry::get('Provas');
-				$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
-				$prova = $find_prova->first();				
-				if (empty($prova)) continue;
+				$col = ($worksheetName == 'CCOM_17_1_1') ? 7 : 6;
 
-				$this->Categorias = TableRegistry::get('Categorias');
-				$find_categoria = $this->Categorias->find()->where(['name'=>$nomeCategoria]);
-				$categoria = $find_categoria->first();				
-				if (empty($categoria)) continue;
-
-				if ($worksheetName == 'CCOM_17_1_1') {
-					if ($worksheet->getCellByColumnAndRow(($colunaCategoria+3), $row)->getValue() == 0){
-						$numeroQuestoes = round(100
-						* $worksheet->getCellByColumnAndRow(($colunaCategoria+1), ($row+1))->getValue()
-						/ $worksheet->getCellByColumnAndRow(($colunaCategoria+3), ($row+1))->getValue());
-					} else {
-						$numeroQuestoes = round(100
-						* $worksheet->getCellByColumnAndRow(($colunaCategoria+1), $row)->getValue()
-						/ $worksheet->getCellByColumnAndRow(($colunaCategoria+3), $row)->getValue());
+				if ($row[$col] == 0) {
+					foreach($parsedData as $item) {
+						if ($item['acertos'] > 0 && $item['categoria_id'] == $catEspec) {
+							$numeroQuestoes = $item['acertos'] + $item['erros'];
+						}
 					}
-					$parsedItem = [
-						'acertos'=>(int) $worksheet->getCellByColumnAndRow(($colunaCategoria+1), $row)->getValue(), 
-						'erros'=>(int) ($numeroQuestoes - $worksheet->getCellByColumnAndRow(($colunaCategoria+1), $row)->getValue()),				    
-					];
 				} else {
-					if ($worksheet->getCellByColumnAndRow(($colunaCategoria+2), $row)->getValue() == 0){
-						$numeroQuestoes = round(100
-						* $worksheet->getCellByColumnAndRow(($colunaCategoria), ($row+1))->getValue()
-						/ $worksheet->getCellByColumnAndRow(($colunaCategoria+2), ($row+1))->getValue());
-					} else {
-						$numeroQuestoes = round(100
-						* $worksheet->getCellByColumnAndRow(($colunaCategoria), $row)->getValue()
-						/ $worksheet->getCellByColumnAndRow(($colunaCategoria+2), $row)->getValue());
-					}
-					$parsedItem = [	
-						'acertos'=>(int) $worksheet->getCellByColumnAndRow($colunaCategoria, $row)->getValue(), 
-						'erros'=>(int) ($numeroQuestoes - $worksheet->getCellByColumnAndRow($colunaCategoria, $row)->getValue()),				    
-					];
+					$numeroQuestoes = round(100
+					* $row[$col]
+					/ $row[$col+2]);
 				}
-
-				$parsedItem += [			
-					'aluno_id'=>$aluno->id,
-					'prova_id'=>$prova->id, 
-					'categoria_id'=>$categoria->id
+				
+				$parsedItem = [	
+					'acertos' => (int) $row[$col], 
+					'erros' => (int) ($numeroQuestoes - $row[$col]),
+					'categoria_id' => $catEspec,		
+					'prova_id' => $prova,  
+					'aluno_id' => $aluno->id,
 				];
 
 				if (isset($parsedData[
@@ -268,22 +295,64 @@ class Parser {
 					$parsedItem['prova_id'] . '-' . 
 					$parsedItem['categoria_id']
 				])) continue;
+				
+				$parsedData[
+					$parsedItem['aluno_id'] . '-' . 
+					$parsedItem['prova_id'] . '-' . 
+					$parsedItem['categoria_id']
+				] = $parsedItem;
 
-				$this->Resultados = TableRegistry::get('Resultados');
-				$find = $this->Resultados->find()->where([
-					'aluno_id'=>$parsedItem['aluno_id'],
-					'prova_id'=>$parsedItem['prova_id'],
-					'categoria_id'=>$parsedItem['categoria_id']
-				]);
-				if ($find->isEmpty()) {
-					$parsedData[
-						$parsedItem['aluno_id'] . '-' . 
-						$parsedItem['prova_id'] . '-' . 
-						$parsedItem['categoria_id']
-					] = $parsedItem;
+				/**********************************************************************/
+
+				$col = ($worksheetName == 'CCOM_17_1_1') ? 10 : 9;
+				
+				if ($row[$col] == 0) {
+					foreach($parsedData as $item) {
+						if ($item['acertos'] > 0 && $item['categoria_id'] == $catGeral) {
+							$numeroQuestoes = $item['acertos'] + $item['erros'];
+						}
+					}
+				} else {
+					$numeroQuestoes = round(100
+					* $row[$col]
+					/ $row[$col+2]);
 				}
-			}  
-		}		  
+				
+				$parsedItem = [	
+					'acertos' => (int) $row[$col], 
+					'erros' => (int) ($numeroQuestoes - $row[$col]),
+					'categoria_id' => $catGeral,
+					'prova_id' => $prova,  		
+					'aluno_id' => $aluno->id,
+				];
+				
+				$parsedData[
+					$parsedItem['aluno_id'] . '-' . 
+					$parsedItem['prova_id'] . '-' . 
+					$parsedItem['categoria_id']
+				] = $parsedItem;
+			}        
+		}		
+		
+		$this->Resultados = TableRegistry::get('Resultados');
+		$find = $this->Resultados->find('list', ['valueField'=>"aluno_id-prova_id-categoria_id"]);
+		$find->select(['aluno_id-prova_id-categoria_id' => $find->func()->
+			concat([
+				'aluno_id'=>'identifier', '-', 
+				'prova_id'=>'identifier', '-', 
+				'categoria_id'=>'identifier'
+			])])
+			->where([
+				'aluno_id-prova_id-categoria_id IN'=>array_keys($parsedData)
+			]);;
+		// pr($find);
+		$find = $find->toArray();
+		// pr($find);
+
+		foreach($find as $item)
+			if(isset($parsedData[$item]))
+				unset($parsedData[$item]);
+
 		return $parsedData;
 	}
 }
