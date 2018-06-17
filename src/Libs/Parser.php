@@ -90,13 +90,19 @@ class Parser {
 
 				
 				if ($worksheetName == 'CCOM_17_1_1') {
-					$parsedItem['turmas'][] = $turmas[$row[5]];
+					if (isset($parsedData[$parsedItem['code']]))
+						$parsedData[$parsedItem['code']]['turmas'][$turmas[$row[5]]->id] = $turmas[$row[5]]->id;
+					else
+						$parsedItem['turmas'][$turmas[$row[5]]->id] = $turmas[$row[5]]->id;
 				} else {
-					$parsedItem['turmas'][] = $turmas[$row[4]];
+					if (isset($parsedData[$parsedItem['code']]))
+						$parsedData[$parsedItem['code']]['turmas'][$turmas[$row[4]]->id] = $turmas[$row[4]]->id;
+					else
+						$parsedItem['turmas'][$turmas[$row[4]]->id] = $turmas[$row[4]]->id;
 				}
 				
-				if (isset($parsedData[$parsedItem['code']])) continue;
-				$parsedData[$parsedItem['code']] = $parsedItem;
+				if (!isset($parsedData[$parsedItem['code']]))
+					$parsedData[$parsedItem['code']] = $parsedItem;
 			}        
 		}
 		

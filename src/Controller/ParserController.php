@@ -94,7 +94,7 @@ class ParserController extends AppController{
 			$turmas = [];
 			foreach($parsed_obj as $key=>$item){
 				foreach($parsed_data[$item->code]['turmas'] as $turma)
-					$turmas[] = ['turma_id'=>$turma->id,
+					$turmas[] = ['turma_id'=>$turma,
 						'prova_id'=>$item->id];
 			}
 			$this->ProvasTurmas = TableRegistry::get('ProvasTurmas');
