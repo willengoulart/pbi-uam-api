@@ -41,6 +41,12 @@ class TurmasTable extends Table
             'joinType' => 'INNER'
         ]);
 
+        $this->belongsToMany('Alunos', [
+            'foreignKey' => 'turma_id',
+            'targetForeignKey' => 'aluno_id',
+            'joinType' => 'INNER'
+        ]);
+
     }
 
     /**

@@ -44,7 +44,11 @@ class AlunosTable extends Table
 
         $this->belongsToMany('Cursos');
 
-        $this->belongsToMany('Turmas');
+        $this->belongsToMany('Turmas', [
+            'targetForeignKey' => 'turma_id',
+            'foreignKey' => 'aluno_id',
+            'joinType' => 'INNER'
+        ]);
 
         $this->hasMany('Resultados', [
             'foreignKey' => 'aluno_id'

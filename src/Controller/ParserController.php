@@ -29,13 +29,13 @@ class ParserController extends AppController{
 		$time_cursos = microtime(true);
 		// echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
 
-		$this->parseProvas();
-		$time_provas = microtime(true);
-		// echo "<br>Provas: " . ($time_provas-$time_cursos) . " segundos";
-
 		$this->parseTurmas();
 		$time_turmas = microtime(true);
-		// echo "<br>Turmas: " . ($time_turmas-$time_provas) . " segundos";
+		// echo "<br>Turmas: " . ($time_turmas-$time_cursos) . " segundos";
+
+		$this->parseProvas();
+		$time_provas = microtime(true);
+		// echo "<br>Provas: " . ($time_provas-$time_provas) . " segundos";
 
 		$this->parseUsuarios();
 		$time_usuarios = microtime(true);
@@ -129,7 +129,12 @@ class ParserController extends AppController{
 		$parsed_data = $this->parser->parseAlunos();
 		if (!empty($parsed_data)) {
 			$this->Alunos = TableRegistry::get('Alunos');
-			$parsed_obj = $this->Alunos->newEntities($parsed_data);
+			//$parsed_obj = $this->Alunos->newEntities($parsed_data);
+			foreach($parsed_data as $item){
+				$parsed_obj = $this->Alunos->newEntity($item);
+				$this->Alunos->save($parsed_obj);
+				$this->Alunos->Turmas->link($parsed_obj, $item['turmas']);
+			}
 			$this->Alunos->saveMany($parsed_obj);
 			unset($parsed_obj);
 		}

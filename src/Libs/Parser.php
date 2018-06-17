@@ -208,6 +208,9 @@ class Parser {
 	public function parseAlunos() {
 		$parsedData = [];
 		$this->Usuarios = TableRegistry::get('Usuarios');
+		$this->Turmas = TableRegistry::get('Turmas');
+
+		$turmas = $this->Turmas->find()->indexBy('code')->toArray();
 
 		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
@@ -222,10 +225,13 @@ class Parser {
 
 				$parsedItem = [									
 					'usuario_id'=>$usuario->id,
-					'ra'=>(int) $row[0]
+					'ra'=>(int) $row[0],
 				];
+				if ($worksheetName == 'CCOM_17_1_1')
+					$parsedItem['turmas'][] = $turmas[$row[5]];
+				else
+					$parsedItem['turmas'][] = $turmas[$row[4]];
 
-				if (isset($parsedData[$parsedItem['ra']])) continue;
 				$parsedData[$parsedItem['ra']] = $parsedItem;
 			}        
 		}
@@ -236,11 +242,10 @@ class Parser {
 				where(['ra IN'=>array_keys($parsedData)])->
 				toArray();
 
-			foreach($find as $item)
+			foreach($find as $id=>$item)
 				if(isset($parsedData[$item]))
-					unset($parsedData[$item]);
+					$parsedData[$item]['id'] = $id;
 		}
-		
 		
 		return $parsedData;
 	}
