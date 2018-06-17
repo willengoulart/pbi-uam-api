@@ -141,10 +141,12 @@ class ParserController extends AppController{
 					$cursos[] = ['curso_id'=>$curso_id,
 								'aluno_id'=>$item->id];
 			}
-			$turmas_obj = $this->Alunos->Turmas->newEntities($turmas);
-			$this->Alunos->Turmas->saveMany($turmas_obj);
-			$cursos_obj = $this->Alunos->Cursos->newEntities($cursos);
-			$this->Alunos->Turmas->saveMany($cursos_obj);
+			$this->AlunosTurmas = TableRegistry::get('AlunosTurmas');
+			$turmas_obj = $this->AlunosTurmas->newEntities($turmas);
+			$this->AlunosTurmas->saveMany($turmas_obj);
+			$this->AlunosCursos = TableRegistry::get('AlunosCursos');
+			$cursos_obj = $this->AlunosCursos->newEntities($cursos);
+			$this->AlunosCursos->saveMany($cursos_obj);
 			unset($parsed_obj);
 		}
 		unset($parsed_data);
