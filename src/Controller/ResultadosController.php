@@ -16,7 +16,9 @@ class ResultadosController extends AppController{
   public function index(){
     $query = $this->Resultados->find();
     $filter = $this->request->query();
-    $query = $query->where($filter);
+    foreach($filter as $field=>$item){
+      $query = $query->where([$field." IN"=>$item]);
+    }
     $data = $query->contain(['Alunos', 'Categorias', 'Provas'])->hydrate(false)->indexBy('id')->toArray();
     foreach($data as &$item){
       unset($item['aluno_id']);
