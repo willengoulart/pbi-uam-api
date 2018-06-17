@@ -32,7 +32,7 @@ class AlunosController extends AppController
 
       $query->where($filter);
 
-      $cursos = $this->paginate($query);
+      $cursos = $query->all();
 
       return $this->response->withStringBody(json_encode($cursos));
   }

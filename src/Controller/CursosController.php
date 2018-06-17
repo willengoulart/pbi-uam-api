@@ -22,7 +22,7 @@ class CursosController extends AppController
         $query = $this->Cursos->find();
         $query->where($filter);
 
-        $cursos = $this->paginate($query);
+        $cursos = $query->all();
 
         return $this->response->withStringBody(json_encode($cursos));
     }

@@ -22,7 +22,7 @@ class CategoriasController extends AppController
       $query = $this->Categorias->find();
       $query->where($filter);
 
-      $cursos = $this->paginate($query);
+      $cursos = $query->all();
 
       return $this->response->withStringBody(json_encode($cursos));
   }

@@ -22,7 +22,7 @@ class TurmasController extends AppController
         $query = $this->Turmas->find();
         $query->where($filter);
 
-        $cursos = $this->paginate($query);
+        $cursos = $query->all();
 
         return $this->response->withStringBody(json_encode($cursos));
     }
