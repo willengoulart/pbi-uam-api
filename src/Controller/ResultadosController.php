@@ -42,4 +42,20 @@ class ResultadosController extends AppController{
     return $this->response->withStatus(403);
   }
 
+  public function getResultadosFromCurso($curso_id){
+    $query = $this->Resultados->find();
+    $this->AlunosCursos = TableRegistry::get('AlunosCursos');
+    $alunos_ids = $this->AlunosCursos->alunosDoCurso($curso_id);
+    $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
+    return $this->response->withStringBody(json_encode($query->all()));
+  }
+
+  public function getResultadosFromTurma($turma_id){
+    $query = $this->Resultados->find();
+    $this->AlunosTurmas = TableRegistry::get('AlunosTurmas');
+    $alunos_ids = $this->AlunosTurmas->alunosDaTurma($turma_id);
+    $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
+    return $this->response->withStringBody(json_encode($query->all()));
+  }
+
 }

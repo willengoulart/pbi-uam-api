@@ -76,4 +76,8 @@ class AlunosCursosTable extends Table
 
         return $rules;
     }
+
+    public function alunosDoCurso($curso_id){
+        return $this->find('list')->where(['curso_id'=>$curso_id])->toArray();
+    }
 }

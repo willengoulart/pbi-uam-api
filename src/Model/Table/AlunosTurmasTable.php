@@ -76,4 +76,9 @@ class AlunosTurmasTable extends Table
 
         return $rules;
     }
+
+    public function alunosDaTurma($turma_id){
+        return $this->find('list')->where(['turma_id'=>$turma_id])->toArray();
+    }
+
 }
