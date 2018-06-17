@@ -229,12 +229,12 @@ class Parser {
 					'ra'=>(int) $row[0],
 				];
 				if ($worksheetName == 'CCOM_17_1_1'){
-					$parsedItem['turmas'][] = $turmas[$row[5]];
-					$parsedItem['cursos'][] = $cursos[$row[3]];
+					$parsedItem['turmas'][] = $turmas[$row[5]]->id;
+					$parsedItem['cursos'][] = $cursos[$row[3]]->id;
 				}
 				else{
-					$parsedItem['turmas'][] = $turmas[$row[4]];
-					$parsedItem['cursos'][] = $cursos[$row[2]];
+					$parsedItem['turmas'][] = $turmas[$row[4]]->id;
+					$parsedItem['cursos'][] = $cursos[$row[2]]->id;
 				}
 				$parsedData[$parsedItem['ra']] = $parsedItem;
 			}        

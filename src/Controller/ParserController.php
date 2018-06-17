@@ -129,17 +129,26 @@ class ParserController extends AppController{
 		$parsed_data = $this->parser->parseAlunos();
 		if (!empty($parsed_data)) {
 			$this->Alunos = TableRegistry::get('Alunos');
-			//$parsed_obj = $this->Alunos->newEntities($parsed_data);
-			foreach($parsed_data as $item){
-				$parsed_obj = $this->Alunos->newEntity($item);
-				$this->Alunos->save($parsed_obj);
-				$this->Alunos->Turmas->link($parsed_obj, $item['turmas']);
-				$this->Alunos->Cursos->link($parsed_obj, $item['cursos']);
+			$parsed_obj = $this->Alunos->newEntities($parsed_data);
+			$parsed_obj = $this->Alunos->saveMany($parsed_obj);
+			$turmas = [];
+			$cursos = [];
+			foreach($parsed_obj as $key=>$item){
+				foreach($parsed_data[$item->ra]['turmas'] as $turma_id)
+					$turmas[] = ['turma_id'=>$turma_id,
+								'aluno_id'=>$item->id];
+				foreach($parsed_data[$item->ra]['cursos'] as $curso_id)
+					$cursos[] = ['curso_id'=>$curso_id,
+								'aluno_id'=>$item->id];
 			}
-			$this->Alunos->saveMany($parsed_obj);
+			$turmas_obj = $this->Alunos->Turmas->newEntities($turmas);
+			$this->Alunos->Turmas->saveMany($turmas_obj);
+			$cursos_obj = $this->Alunos->Cursos->newEntities($cursos);
+			$this->Alunos->Turmas->saveMany($cursos_obj);
 			unset($parsed_obj);
 		}
 		unset($parsed_data);
+		
 	}
 
 	public function parseResultados() {
