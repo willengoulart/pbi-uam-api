@@ -63,6 +63,9 @@ class Parser {
 	public function parseProvas() {
 		$parsedData = [];
 		$this->Cursos = TableRegistry::get('Cursos');
+		$this->Turmas = TableRegistry::get('Turmas');
+
+		$turmas = $this->Turmas->find()->indexBy('code')->toArray();
 
 		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
@@ -82,8 +85,15 @@ class Parser {
 				$parsedItem = [
 					'curso_id'=>$curso->id,
 					'code'=>$worksheetName,
-					'name'=>$worksheetName
+					'name'=>$worksheetName,
 				];
+
+				
+				if ($worksheetName == 'CCOM_17_1_1') {
+					$parsedItem['turmas'][] = $turmas[$row[5]];
+				} else {
+					$parsedItem['turmas'][] = $turmas[$row[4]];
+				}
 				
 				if (isset($parsedData[$parsedItem['code']])) continue;
 				$parsedData[$parsedItem['code']] = $parsedItem;

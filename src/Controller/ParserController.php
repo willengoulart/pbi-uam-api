@@ -27,32 +27,32 @@ class ParserController extends AppController{
 		
 		$this->parseCursos();
 		$time_cursos = microtime(true);
-		echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
+		// echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
 
 		$this->parseTurmas();
 		$time_turmas = microtime(true);
-		echo "<br>Turmas: " . ($time_turmas-$time_cursos) . " segundos";
+		// echo "<br>Turmas: " . ($time_turmas-$time_cursos) . " segundos";
 
 		$this->parseProvas();
 		$time_provas = microtime(true);
-		echo "<br>Provas: " . ($time_provas-$time_provas) . " segundos";
+		// echo "<br>Provas: " . ($time_provas-$time_provas) . " segundos";
 
 		$this->parseUsuarios();
 		$time_usuarios = microtime(true);
-		echo "<br>Usuarios: " . ($time_usuarios-$time_turmas) . " segundos";
+		// echo "<br>Usuarios: " . ($time_usuarios-$time_turmas) . " segundos";
 
 		$this->parseAlunos();
 		$time_alunos = microtime(true);
-		echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
+		// echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
 
 		$this->createCategorias();
 		$this->parseResultados();
 		$time_resultados = microtime(true);
-		echo "<br>Resultados: " . ($time_resultados-$time_alunos) . " segundos";
+		// echo "<br>Resultados: " . ($time_resultados-$time_alunos) . " segundos";
 				
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
-		echo "<br>Importacao demorou " . $time . " segundos";
+		// echo "<br>Importacao demorou " . $time . " segundos";
 
 		echo json_encode($this->string);
 	}
@@ -90,7 +90,18 @@ class ParserController extends AppController{
 		if (!empty($parsed_data)) {
 			$this->Provas = TableRegistry::get('Provas');
 			$parsed_obj = $this->Provas->newEntities($parsed_data);
-			$this->Provas->saveMany($parsed_obj);
+			$parsed_obj = $this->Provas->saveMany($parsed_obj);
+			$turmas = [];
+			foreach($parsed_obj as $key=>$item){
+				foreach($parsed_data[$item->code]['turmas'] as $turma)
+					$turmas[] = ['turma_id'=>$turma->id,
+						'prova_id'=>$item->id];
+			}
+			$this->ProvasTurmas = TableRegistry::get('ProvasTurmas');
+			$turmas_obj = $this->ProvasTurmas->newEntities($turmas);
+
+			$this->ProvasTurmas->saveMany($turmas_obj);
+			//pr($turmas_obj);
 			unset($parsed_obj);
 		}
 		unset($parsed_data);
