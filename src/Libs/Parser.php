@@ -8,26 +8,33 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class Parser {
 
 	private $spreadsheet;
+	private $reader;
+	private $inputFileName;
+	private $worksheets;
 
 	function __construct() {
 		$uploadPath = APP."Libs/";
 		$filename = "DadosTP_mask.xlsx"; 
-		$inputFileName = $uploadPath . $filename;		
-	  	$inputFileType = IOFactory::identify($inputFileName);
-	  	$reader = IOFactory::createReader($inputFileType);
-		$reader->setReadDataOnly(true);	
-		$worksheetNames = $reader->listWorksheetNames($inputFileName);
-		$this->spreadsheet = $reader->load($inputFileName);
+		$this->inputFileName = $uploadPath . $filename;		
+	  	$inputFileType = IOFactory::identify($this->inputFileName);
+	  	$this->reader = IOFactory::createReader($inputFileType);
+		$this->reader->setReadDataOnly(true);	
+		$worksheetNames = $this->reader->listWorksheetNames($this->inputFileName);
+		$this->spreadsheet = $this->reader->load($this->inputFileName);
+		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+			$this->worksheets[$worksheet->getTitle()] = $worksheet->toArray();
+		}
+		$this->spreadsheet->disconnectWorksheets();
+		unset($this->spreadsheet);
 	}
 
 	public function parseCursos() {		
 		$parsedData = [];
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
-			$worksheetName = $worksheet->getTitle();
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if($i < 2){ $i++; continue; }
 
 				if ($worksheetName == 'CCOM_17_1_1') {	
@@ -49,7 +56,7 @@ class Parser {
 		foreach($find as $item)
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
-
+		
 		return $parsedData;		
 	}
 
@@ -57,11 +64,10 @@ class Parser {
 		$parsedData = [];
 		$this->Cursos = TableRegistry::get('Cursos');
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
-			$worksheetName = $worksheet->getTitle();
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if($i < 2){ $i++; continue; }
 
 				if ($worksheetName == 'CCOM_17_1_1') {
@@ -92,7 +98,7 @@ class Parser {
 		foreach($find as $item)
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
-
+		
 		return $parsedData;		
 	}
 
@@ -100,11 +106,10 @@ class Parser {
 		$parsedData = [];
 		$this->Cursos = TableRegistry::get('Cursos');
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
-			$worksheetName = $worksheet->getTitle();
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if($i < 2){ $i++; continue; }
 
 				if ($worksheetName == 'CCOM_17_1_1') {
@@ -164,7 +169,6 @@ class Parser {
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
 		}
-
 		return $parsedData;
 	}
 
@@ -172,10 +176,10 @@ class Parser {
 		$parsedData = [];
 		$this->Usuarios = TableRegistry::get('Usuarios');
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if($i < 2){ $i++; continue; }
 				$ra = $row[0]; 				
 				$parsedItem = [			
@@ -198,7 +202,6 @@ class Parser {
 			if(isset($parsedData[$item]))
 				unset($parsedData[$item]);
 		
-
 		return $parsedData;		
 	}
 
@@ -206,10 +209,10 @@ class Parser {
 		$parsedData = [];
 		$this->Usuarios = TableRegistry::get('Usuarios');
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if($i < 2){ $i++; continue; }
 
 				$nome = $row[1];
@@ -227,16 +230,18 @@ class Parser {
 			}        
 		}
 		
-		$this->Alunos = TableRegistry::get('Alunos');
-		$find = $this->Alunos->find('list', ['valueField'=>"ra"])->
-			where(['ra IN'=>array_keys($parsedData)])->
-			toArray();
+		if(!empty($parsedData)){
+			$this->Alunos = TableRegistry::get('Alunos');
+			$find = $this->Alunos->find('list', ['valueField'=>"ra"])->
+				where(['ra IN'=>array_keys($parsedData)])->
+				toArray();
 
-		foreach($find as $item)
-			if(isset($parsedData[$item]))
-				unset($parsedData[$item]);
+			foreach($find as $item)
+				if(isset($parsedData[$item]))
+					unset($parsedData[$item]);
+		}
 		
-
+		
 		return $parsedData;
 	}
 
@@ -252,16 +257,15 @@ class Parser {
 		$find_categoria = $this->Categorias->find()->where(['name'=>"Conhecimentos Gerais"]);
 		$catGeral = $find_categoria->first()->id;
 
-		foreach ($this->spreadsheet->getAllSheets() as $worksheet) {
+		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
-			$worksheetName = $worksheet->getTitle();
 
 			$find_prova = $this->Provas->find()->where(['code'=>$worksheetName]);
 			$prova = $find_prova->first();				
 			if (empty($prova)) continue;
 			$prova = $prova->id;	
 
-			foreach ($worksheet->toArray() as $row) {
+			foreach ($worksheet as $row) {
 				if ($i < 2) { $i++; continue; }
 
 				$find_aluno = $this->Alunos->find()->where(['ra'=>$row[0]]);
@@ -335,24 +339,26 @@ class Parser {
 		}		
 		
 		$this->Resultados = TableRegistry::get('Resultados');
-		$find = $this->Resultados->find('list', ['valueField'=>"aluno_id-prova_id-categoria_id"]);
-		$find->select(['aluno_id-prova_id-categoria_id' => $find->func()->
-			concat([
-				'aluno_id'=>'identifier', '-', 
-				'prova_id'=>'identifier', '-', 
-				'categoria_id'=>'identifier'
-			])])
-			->where([
-				'aluno_id-prova_id-categoria_id IN'=>array_keys($parsedData)
-			]);;
-		// pr($find);
-		$find = $find->toArray();
-		// pr($find);
+		if(!empty(array_keys($parsedData))){
+			$find = $this->Resultados->find('list', ['valueField'=>"aluno_id-prova_id-categoria_id"]);
+			$find->select(['aluno_id-prova_id-categoria_id' => $find->func()->
+				concat([
+					'aluno_id'=>'identifier', '-', 
+					'prova_id'=>'identifier', '-', 
+					'categoria_id'=>'identifier'
+				])])
+				->where([
+					'aluno_id-prova_id-categoria_id IN'=>array_keys($parsedData)
+				]);;
+			// pr($find);
+			$find = $find->toArray();
+			// pr($find);
 
-		foreach($find as $item)
-			if(isset($parsedData[$item]))
-				unset($parsedData[$item]);
-
+			foreach($find as $item)
+				if(isset($parsedData[$item]))
+					unset($parsedData[$item]);
+		}
+		
 		return $parsedData;
 	}
 }

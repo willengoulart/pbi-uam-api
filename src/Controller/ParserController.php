@@ -15,43 +15,46 @@ use Cake\ORM\TableRegistry;
 class ParserController extends AppController{
 
 	private $parser;
+	private $string;
 
 	public function initialize() {
 		$this->parser = new Parser();
 	}
 
 	public function parse(){
+		$this->autoRender = false;
 		$time_start = microtime(true);
-
+		
 		$this->parseCursos();
 		$time_cursos = microtime(true);
-		echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
+		// echo "<br>Cursos: " . ($time_cursos-$time_start) . " segundos";
 
 		$this->parseProvas();
 		$time_provas = microtime(true);
-		echo "<br>Provas: " . ($time_provas-$time_cursos) . " segundos";
+		// echo "<br>Provas: " . ($time_provas-$time_cursos) . " segundos";
 
 		$this->parseTurmas();
 		$time_turmas = microtime(true);
-		echo "<br>Turmas: " . ($time_turmas-$time_provas) . " segundos";
-		
+		// echo "<br>Turmas: " . ($time_turmas-$time_provas) . " segundos";
+
 		$this->parseUsuarios();
 		$time_usuarios = microtime(true);
-		echo "<br>Usuarios: " . ($time_usuarios-$time_turmas) . " segundos";
+		// echo "<br>Usuarios: " . ($time_usuarios-$time_turmas) . " segundos";
 
 		$this->parseAlunos();
 		$time_alunos = microtime(true);
-		echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
+		// echo "<br>Alunos: " . ($time_alunos-$time_usuarios) . " segundos";
 
 		$this->createCategorias();
-
 		$this->parseResultados();
 		$time_resultados = microtime(true);
-		echo "<br>Resultados: " . ($time_resultados-$time_alunos) . " segundos";
+		// echo "<br>Resultados: " . ($time_resultados-$time_alunos) . " segundos";
 				
 		$time_end = microtime(true);
 		$time = $time_end - $time_start;
-		echo "<br>Importacao demorou " . $time . " segundos";
+		// echo "<br>Importacao demorou " . $time . " segundos";
+
+		echo json_encode($this->string);
 	}
 
 	public function createCategorias(){
@@ -77,7 +80,9 @@ class ParserController extends AppController{
 			$this->Cursos = TableRegistry::get('Cursos');
 			$parsed_obj = $this->Cursos->newEntities($parsed_data);
 			$this->Cursos->saveMany($parsed_obj);
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 	public function parseProvas() {
@@ -86,7 +91,9 @@ class ParserController extends AppController{
 			$this->Provas = TableRegistry::get('Provas');
 			$parsed_obj = $this->Provas->newEntities($parsed_data);
 			$this->Provas->saveMany($parsed_obj);
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 	public function parseTurmas() {
@@ -95,7 +102,9 @@ class ParserController extends AppController{
 			$this->Turmas = TableRegistry::get('Turmas');
 			$parsed_obj = $this->Turmas->newEntities($parsed_data);
 			$this->Turmas->saveMany($parsed_obj);
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 	public function parseUsuarios(){
@@ -107,12 +116,13 @@ class ParserController extends AppController{
 			if(!$this->Usuarios->saveMany($parsed_obj)){
 				foreach ($parsed_obj as $key => $value) {
 					if($erros = $value->errors()){
-						echo "<br>Usuário " . $value->nome . " (Email: ".$value->email.") 
-						possui dados incompletos";
+						$this->string[] = "Usuário " . $value->nome . " (Email: ".$value->email.") possui dados incompletos";
 					}
 				}
 			}
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 	public function parseAlunos() {
@@ -121,7 +131,9 @@ class ParserController extends AppController{
 			$this->Alunos = TableRegistry::get('Alunos');
 			$parsed_obj = $this->Alunos->newEntities($parsed_data);
 			$this->Alunos->saveMany($parsed_obj);
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 	public function parseResultados() {
@@ -130,7 +142,9 @@ class ParserController extends AppController{
 			$this->Resultados = TableRegistry::get('Resultados');
 			$parsed_obj = $this->Resultados->newEntities($parsed_data);
 			$this->Resultados->saveMany($parsed_obj);
+			unset($parsed_obj);
 		}
+		unset($parsed_data);
 	}
 
 }
