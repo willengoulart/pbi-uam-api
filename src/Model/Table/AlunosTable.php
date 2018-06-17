@@ -42,7 +42,11 @@ class AlunosTable extends Table
             'joinType' => 'INNER'
         ]);
 
-        $this->belongsToMany('Cursos');
+        $this->belongsToMany('Cursos', [
+            'targetForeignKey' => 'curso_id',
+            'foreignKey' => 'aluno_id',
+            'joinType' => 'INNER'
+        ]);
 
         $this->belongsToMany('Turmas', [
             'targetForeignKey' => 'turma_id',

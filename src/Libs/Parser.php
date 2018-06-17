@@ -211,6 +211,7 @@ class Parser {
 		$this->Turmas = TableRegistry::get('Turmas');
 
 		$turmas = $this->Turmas->find()->indexBy('code')->toArray();
+		$cursos = $this->Cursos->find()->indexBy('name')->toArray();
 
 		foreach ($this->worksheets as $worksheetName=>$worksheet) {
 			$i = 0;
@@ -227,11 +228,14 @@ class Parser {
 					'usuario_id'=>$usuario->id,
 					'ra'=>(int) $row[0],
 				];
-				if ($worksheetName == 'CCOM_17_1_1')
+				if ($worksheetName == 'CCOM_17_1_1'){
 					$parsedItem['turmas'][] = $turmas[$row[5]];
-				else
+					$parsedItem['cursos'][] = $cursos[$row[3]];
+				}
+				else{
 					$parsedItem['turmas'][] = $turmas[$row[4]];
-
+					$parsedItem['cursos'][] = $cursos[$row[2]];
+				}
 				$parsedData[$parsedItem['ra']] = $parsedItem;
 			}        
 		}
