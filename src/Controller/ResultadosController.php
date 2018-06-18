@@ -32,7 +32,7 @@ class ResultadosController extends AppController{
     if(!$this->request->query('aluno_id')){
       // USUARIO DA SESSAO
       $user_id = 2;
-      $query = $this->Resultados->find();
+      $query = $this->Resultados->find()->contain(['Provas']);
       $filter = $this->request->query();
       $query = $query->where($filter);
       // Forçar o usuário logado
@@ -43,7 +43,7 @@ class ResultadosController extends AppController{
   }
 
   public function getResultadosFromCurso($curso_id){
-    $query = $this->Resultados->find();
+    $query = $this->Resultados->find()->contain(['Provas']);
     $this->AlunosCursos = TableRegistry::get('AlunosCursos');
     $alunos_ids = $this->AlunosCursos->alunosDoCurso($curso_id);
     $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
@@ -51,7 +51,7 @@ class ResultadosController extends AppController{
   }
 
   public function getResultadosFromTurma($turma_id){
-    $query = $this->Resultados->find();
+    $query = $this->Resultados->find()->contain(['Provas']);
     $this->AlunosTurmas = TableRegistry::get('AlunosTurmas');
     $alunos_ids = $this->AlunosTurmas->alunosDaTurma($turma_id);
     $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
