@@ -45,17 +45,26 @@ class ResultadosController extends AppController{
   public function getResultadosFromCurso($curso_id){
     $query = $this->Resultados->find()->contain(['Provas']);
     $this->AlunosCursos = TableRegistry::get('AlunosCursos');
-    $alunos_ids = $this->AlunosCursos->alunosDoCurso($curso_id);
-    $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
-    return $this->response->withStringBody(json_encode($query->all()));
+    if(!empty($alunos_ids)){
+      $query->where(['aluno_id IN'=>($alunos_ids)]);
+      return $this->response->withStringBody(json_encode($query->all()));
+    }
+    else{
+      return $this->response->withStringBody(json_encode([]));
+    }
   }
 
   public function getResultadosFromTurma($turma_id){
     $query = $this->Resultados->find()->contain(['Provas']);
     $this->AlunosTurmas = TableRegistry::get('AlunosTurmas');
-    $alunos_ids = $this->AlunosTurmas->alunosDaTurma($turma_id);
-    $query->where(['aluno_id IN'=>array_keys($alunos_ids)]);
-    return $this->response->withStringBody(json_encode($query->all()));
+    $alunos_ids = array_keys($this->AlunosTurmas->alunosDaTurma($turma_id));
+    if(!empty($alunos_ids)){
+      $query->where(['aluno_id IN'=>($alunos_ids)]);
+      return $this->response->withStringBody(json_encode($query->all()));
+    }
+    else{
+      return $this->response->withStringBody(json_encode([]));
+    }
   }
 
 }
