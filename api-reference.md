@@ -560,6 +560,8 @@ $.ajax({
 Método                                  | URL                 | Descrição curta
 --------------------------------------- | ------------------- | -----------------
 [Buscar resultados](#buscar-resultados) | **GET:** `/resultados` | Retorna uma lista de resultados cadastrados no sistema
+[Buscar resultados por Turma](#buscar-resultados-turma) | **GET:** `/resultados/getResultadosFromTurma/[TURMA_ID]` | Retorna uma lista de resultados cadastrados no sistema da turma TURMA_ID
+[Buscar resultados por Curso](#buscar-resultados-curso) | **GET:** `/resultados/getResultadosFromCurso/[CURSO_ID]` | Retorna uma lista de resultados cadastrados no sistema do curso CURSO_ID
 
 ### Buscar resultados
 Retorna uma lista de resultados baseada nos filtros informados.
@@ -616,3 +618,50 @@ $.ajax({
     ]
 }
 ```
+
+### Buscar resultados por Turma
+Retorna uma lista de resultados baseada nos filtros informados.
+
+#### Parâmetros
+
+Parâmetro  | Tipo                        | Default   | Descrição
+---------- | --------------------------- | --------- |-----------
+TURMA_ID     | `Number` | -    | Filtra a lista de resultados pela turma
+
+#### Exemplo de requisição (Ajax)
+
+``` javascript
+$.ajax({
+    url: '/resultados/getResultadosFromTurma/2',
+    method: 'GET',
+    dataType: 'json',
+});
+```
+
+#### JSON de retorno
+
+O JSON de retorno é o mesmo da chamada /resultados
+
+
+### Buscar resultados por Curso
+Retorna uma lista de resultados baseada nos filtros informados.
+
+#### Parâmetros
+
+Parâmetro  | Tipo                        | Default   | Descrição
+---------- | --------------------------- | --------- |-----------
+CURSO_ID     | `Number` | -    | Filtra a lista de resultados pelo CURSO
+
+#### Exemplo de requisição (Ajax)
+
+``` javascript
+$.ajax({
+    url: '/resultados/getResultadosFromCurso/2',
+    method: 'GET',
+    dataType: 'json',
+});
+```
+
+#### JSON de retorno
+
+O JSON de retorno é o mesmo da chamada /resultados
