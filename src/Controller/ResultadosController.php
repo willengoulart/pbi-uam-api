@@ -54,13 +54,23 @@ class ResultadosController extends AppController{
     }
   }
 
-  public function getResultadosFromTurma($turma_id){
-    $query = $this->Resultados->find()->contain(['Provas']);
+  public function getResultadosFromTurma(){
+    $turmas_ids = $this->request->getQuery('turma_id');
     $this->AlunosTurmas = TableRegistry::get('AlunosTurmas');
-    $alunos_ids = array_keys($this->AlunosTurmas->alunosDaTurma($turma_id));
+    $alunos_ids = $this->AlunosTurmas->alunosDasTurmas($turmas_ids);
     if(!empty($alunos_ids)){
-      $query->where(['aluno_id IN'=>($alunos_ids)]);
-      return $this->response->withStringBody(json_encode($query->all()));
+      $data = [];
+      foreach($alunos_ids as $turma_id => $alunos){
+        if($alunos){
+          $query = $this->Resultados->find()->contain(['Provas']);
+          $query->where(['aluno_id IN'=>($alunos)]);
+          $data[$turma_id] = $query->all();
+        }
+        else {
+          $data[$turma_id] = [];
+        }
+      }
+     return $this->response->withStringBody(json_encode($data));
     }
     else{
       return $this->response->withStringBody(json_encode([]));

@@ -81,4 +81,11 @@ class AlunosTurmasTable extends Table
         return $this->find('list')->where(['turma_id'=>$turma_id])->toArray();
     }
 
+    public function alunosDasTurmas($turmas_id){
+      $data = [];
+        foreach($turmas_id as $turma_id)
+          $data[$turma_id] = $this->find('list')->where(['turma_id IN'=>$turma_id])->toArray();
+        return $data;
+    }
+
 }

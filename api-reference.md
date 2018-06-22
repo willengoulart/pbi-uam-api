@@ -626,13 +626,13 @@ Retorna uma lista de resultados baseada nos filtros informados.
 
 Parâmetro  | Tipo                        | Default   | Descrição
 ---------- | --------------------------- | --------- |-----------
-TURMA_ID     | `Number` | -    | Filtra a lista de resultados pela turma
+turma_id     | `Array` | -    | Filtra a lista de resultados pelas turmas
 
 #### Exemplo de requisição (Ajax)
 
 ``` javascript
 $.ajax({
-    url: '/resultados/getResultadosFromTurma/2',
+    url: '/resultados/getResultadosFromTurma?turma_id[]=2&turma_id[]=3',
     method: 'GET',
     dataType: 'json',
 });
